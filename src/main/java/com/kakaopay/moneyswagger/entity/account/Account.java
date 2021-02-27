@@ -19,6 +19,8 @@ public class Account {
 
     private BigDecimal balance = BigDecimal.ZERO; //잔액
 
+    @ManyToOne
+    @JoinColumn(name = "member_id")
     private Member member;
 
     @Builder
