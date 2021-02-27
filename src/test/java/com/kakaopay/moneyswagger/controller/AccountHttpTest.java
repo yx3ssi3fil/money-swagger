@@ -14,7 +14,7 @@ public class AccountHttpTest {
     public CreateAccountDto.Response createAccount(Long memberId) {
         CreateAccountDto.Request requestBody = new CreateAccountDto.Request(memberId);
 
-        return webTestClient.post().uri(AccountController.URL_CREATE_ACCOUNTS)
+        return webTestClient.post().uri(AccountController.URL_CREATE_ACCOUNT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(requestBody)

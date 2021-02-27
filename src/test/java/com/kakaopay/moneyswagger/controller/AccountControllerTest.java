@@ -2,9 +2,11 @@ package com.kakaopay.moneyswagger.controller;
 
 import com.kakaopay.moneyswagger.AbstractControllerTest;
 import com.kakaopay.moneyswagger.dto.CreateAccountDto;
+import com.kakaopay.moneyswagger.dto.RetrieveAccountDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,5 +33,27 @@ public class AccountControllerTest extends AbstractControllerTest {
         assertThat(responseBody.getMemberId()).isEqualTo(memberId);
         assertThat(responseBody.getMemberName()).isEqualTo("name");
         assertThat(responseBody.getBalance()).isEqualTo(0);
+    }
+
+    @DisplayName("계좌 조회")
+    @Test
+    void retrieveAccount() {
+        //given
+        Long accountId = accountHttpTest.createAccount(memberId).getAccountId();
+
+        //when
+        RetrieveAccountDto.Response responseBody = webTestClient.get().uri(AccountController.URL_RETRIEVE_ACCOUNT + "/{id}", accountId)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(RetrieveAccountDto.Response.class)
+                .returnResult()
+                .getResponseBody();
+
+        //then
+        assertThat(responseBody.getAccountId()).isEqualTo(accountId);
+        assertThat(responseBody.getBalance()).isEqualTo(0);
+        assertThat(responseBody.getMemberId()).isEqualTo(memberId);
+        assertThat(responseBody.getMemberName()).isEqualTo("name");
     }
 }

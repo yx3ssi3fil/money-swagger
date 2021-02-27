@@ -19,12 +19,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RestController
 public class AccountController {
-    public static final String URL_CREATE_ACCOUNTS = "/accounts";
+    public static final String URL_CREATE_ACCOUNT = "/accounts";
+    public static final String URL_RETRIEVE_ACCOUNT = "/accounts/{id}";
 
     private final AccountService accountService;
     private final MemberService memberService;
 
-    @PostMapping(URL_CREATE_ACCOUNTS)
+    @PostMapping(URL_CREATE_ACCOUNT)
     public ResponseEntity<CreateAccountDto.Response> createAccount(@RequestBody CreateAccountDto.Request request) {
         Optional<Member> optionalMember = memberService.retrieveMemberById(request.getMemberId());
         if (optionalMember.isEmpty()) {
@@ -37,7 +38,7 @@ public class AccountController {
         Account savedAccount = accountService.createAccount(member);
         CreateAccountDto.Response responseBody = CreateAccountDto.Response.from(savedAccount);
         return ResponseEntity
-                .created(URI.create(URL_CREATE_ACCOUNTS + "/" + savedAccount.getId()))
+                .created(URI.create(URL_CREATE_ACCOUNT + "/" + savedAccount.getId()))
                 .body(responseBody);
     }
 }
