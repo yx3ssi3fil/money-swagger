@@ -24,6 +24,7 @@ public class AccountController {
     public static final String URL_CREATE_ACCOUNT = "/accounts";
     public static final String URL_RETRIEVE_ACCOUNT = "/accounts/{accountId}";
     public static final String URL_DEPOSIT = "/accounts/{accountId}/deposit";
+    public static final String URL_TRANSFER = "/accounts/{accountId}/transfer";
 
     private final AccountService accountService;
     private final MemberService memberService;
