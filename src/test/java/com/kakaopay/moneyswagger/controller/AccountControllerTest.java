@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
-import reactor.core.publisher.Flux;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -111,24 +110,8 @@ public class AccountControllerTest extends AbstractControllerTest {
         CreateAccountDto.Response receiverAccount = accountHttpTest.createAccount(receiver.getId());
         Integer transferAmount = 20000;
 
-        TransferDto.Request requestBody = TransferDto.Request.builder()
-                .transferAmount(transferAmount)
-                .giverName(giver.getName())
-                .giverMemberId(giver.getId())
-                .receiverAccountId(receiverAccount.getAccountId())
-                .receiverName(receiverAccount.getMemberName())
-                .build();
-
         //when
-        TransferDto.Response responseBody = webTestClient.put().uri(AccountController.URL_TRANSFER, giverAccount.getAccountId())
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(requestBody)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(TransferDto.Response.class)
-                .returnResult()
-                .getResponseBody();
+        TransferDto.Response responseBody = accountHttpTest.transfer(transferAmount, giver, giverAccount, receiver, receiverAccount);
 
         //then
         assertThat(responseBody.getGiverAccountId()).isEqualTo(giverAccount.getAccountId());
