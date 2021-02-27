@@ -42,13 +42,7 @@ public class AccountControllerTest extends AbstractControllerTest {
         Long accountId = accountHttpTest.createAccount(memberId).getAccountId();
 
         //when
-        RetrieveAccountDto.Response responseBody = webTestClient.get().uri(AccountController.URL_RETRIEVE_ACCOUNT, accountId)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(RetrieveAccountDto.Response.class)
-                .returnResult()
-                .getResponseBody();
+        RetrieveAccountDto.Response responseBody = accountHttpTest.retrieveAccount(accountId);
 
         //then
         assertThat(responseBody.getAccountId()).isEqualTo(accountId);
