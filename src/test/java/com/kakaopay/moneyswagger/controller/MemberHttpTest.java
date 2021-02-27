@@ -1,6 +1,7 @@
 package com.kakaopay.moneyswagger.controller;
 
 import com.kakaopay.moneyswagger.dto.CreateMemberDto;
+import com.kakaopay.moneyswagger.dto.RetrieveMemberDto;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -22,6 +23,17 @@ public class MemberHttpTest {
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(CreateMemberDto.Response.class)
+                .returnResult()
+                .getResponseBody();
+    }
+
+    public RetrieveMemberDto.Response retrieveMember(Long memberId) {
+        return webTestClient
+                .get().uri(MemberController.URL_CREATE_MEMBER + "/{id}", memberId)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(RetrieveMemberDto.Response.class)
                 .returnResult()
                 .getResponseBody();
     }

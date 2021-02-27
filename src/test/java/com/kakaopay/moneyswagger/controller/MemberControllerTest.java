@@ -39,14 +39,7 @@ public class MemberControllerTest extends AbstractControllerTest {
         Long memberId = memberHttpTest.createMember("name").getId();
 
         //when
-        RetrieveMemberDto.Response responseBody = webTestClient
-                .get().uri(MemberController.URL_CREATE_MEMBER + "/{id}", memberId)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(RetrieveMemberDto.Response.class)
-                .returnResult()
-                .getResponseBody();
+        RetrieveMemberDto.Response responseBody = memberHttpTest.retrieveMember(memberId);
 
         //then
         assertThat(responseBody.getId()).isNotNull().isNotNegative();
