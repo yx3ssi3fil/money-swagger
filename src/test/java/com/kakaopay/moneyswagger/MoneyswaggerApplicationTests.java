@@ -5,10 +5,4 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class MoneyswaggerApplicationTests {
-
-    @Test
-    void contextLoads() {
-
-    }
-
 }
