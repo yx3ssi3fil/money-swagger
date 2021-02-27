@@ -17,4 +17,6 @@ public class MoneySwagging extends BaseTimeEntity {
     @GeneratedValue
     @Column(name = "money_swagging_id")
     private Long id;
+
+    private String token;
 }
