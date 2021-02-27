@@ -2,6 +2,7 @@ package com.kakaopay.moneyswagger.entity.member;
 
 import com.kakaopay.moneyswagger.entity.account.Account;
 import com.kakaopay.moneyswagger.entity.base.BaseTimeEntity;
+import com.kakaopay.moneyswagger.entity.chat.ChatRoom;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,10 @@ public class Member extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "member")
     private List<Account> accounts = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "chat_room_id")
+    private ChatRoom chatroom;
 
     @Builder
     public Member(Long id, String name) {

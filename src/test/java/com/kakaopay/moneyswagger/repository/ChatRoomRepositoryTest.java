@@ -22,10 +22,10 @@ class ChatRoomRepositoryTest {
     @Test
     void createChatRoom() {
         //given
-        Member member1 = new Member("member1");
-        Member member2 = new Member("member2");
-        Member member3 = new Member("member3");
-        Member member4 = new Member("member4");
+        Member member1 = memberRepository.save(new Member("member1"));
+        Member member2 = memberRepository.save(new Member("member2"));
+        Member member3 = memberRepository.save(new Member("member3"));
+        Member member4 = memberRepository.save(new Member("member4"));
         List<Member> members = List.of(member1, member2, member3, member4);
         String uuid = RandomStringUtils.randomAlphabetic(10);
         ChatRoom chatRoom = ChatRoom.builder().id(uuid).members(members).build();
