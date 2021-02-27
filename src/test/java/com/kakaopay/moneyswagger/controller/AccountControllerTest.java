@@ -26,7 +26,7 @@ public class AccountControllerTest extends AbstractControllerTest {
         CreateAccountDto.Request requestBody = new CreateAccountDto.Request(memberId);
 
         //when
-        CreateAccountDto.Response responseBody = webTestClient.post().uri(AccountController.URL_ACCOUNTS)
+        CreateAccountDto.Response responseBody = webTestClient.post().uri(AccountController.URL_CREATE_ACCOUNTS)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(requestBody)
@@ -40,5 +40,6 @@ public class AccountControllerTest extends AbstractControllerTest {
         assertThat(responseBody.getAccountId()).isNotNull().isNotNegative();
         assertThat(responseBody.getMemberId()).isEqualTo(memberId);
         assertThat(responseBody.getMemberName()).isEqualTo("name");
+        assertThat(responseBody.getBalance()).isEqualTo(0);
     }
 }

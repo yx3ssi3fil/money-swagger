@@ -17,7 +17,7 @@ public class Account {
     @Column(name = "account_id")
     private Long id; //게좌번호 역할 포함
 
-    private BigDecimal balance = BigDecimal.ZERO; //잔액
+    private BigDecimal balance; //잔액
 
     @ManyToOne
     @JoinColumn(name = "member_id")
