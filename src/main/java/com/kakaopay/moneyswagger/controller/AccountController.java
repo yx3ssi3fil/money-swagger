@@ -1,6 +1,7 @@
 package com.kakaopay.moneyswagger.controller;
 
 import com.kakaopay.moneyswagger.dto.CreateAccountDto;
+import com.kakaopay.moneyswagger.dto.DepositDto;
 import com.kakaopay.moneyswagger.dto.RetrieveAccountDto;
 import com.kakaopay.moneyswagger.entity.account.Account;
 import com.kakaopay.moneyswagger.entity.member.Member;
@@ -9,8 +10,10 @@ import com.kakaopay.moneyswagger.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.net.URI;
 import java.util.Optional;
 
@@ -20,7 +23,7 @@ import java.util.Optional;
 public class AccountController {
     public static final String URL_CREATE_ACCOUNT = "/accounts";
     public static final String URL_RETRIEVE_ACCOUNT = "/accounts/{accountId}";
-    public static final String URL_UPDATE_ACCOUNT = "/accounts/{accountId}";
+    public static final String URL_DEPOSIT = "/accounts/{accountId}/deposit";
 
     private final AccountService accountService;
     private final MemberService memberService;
@@ -56,5 +59,27 @@ public class AccountController {
         return ResponseEntity
                 .ok()
                 .body(responseBody);
+    }
+
+    @PutMapping(URL_DEPOSIT)
+    public ResponseEntity<DepositDto.Response> deposit(@PathVariable Long accountId, @RequestBody @Valid DepositDto.Request request) {
+        Optional<Account> optionalAccount = accountService.retrieveById(accountId);
+        if (optionalAccount.isEmpty()) {
+            return ResponseEntity
+                    .badRequest()
+                    .build();
+        }
+
+        Account account = optionalAccount.get();
+        if (!account.getMember().getId().equals(request.getMemberId())) {
+            return ResponseEntity
+                    .badRequest()
+                    .build();
+        }
+
+        Account accountAfterDeposit = accountService.deposit(account, request.getDepositAmount());
+        DepositDto.Response responseBody = DepositDto.Response.from(accountAfterDeposit);
+        return ResponseEntity
+                .ok(responseBody);
     }
 }

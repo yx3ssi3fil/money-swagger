@@ -29,4 +29,8 @@ public class Account {
         this.balance = balance;
         this.member = member;
     }
+
+    public void deposit(Integer depositAmount) {
+        this.balance = this.balance.add(BigDecimal.valueOf(depositAmount));
+    }
 }

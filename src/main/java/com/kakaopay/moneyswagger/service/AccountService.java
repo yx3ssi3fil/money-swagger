@@ -31,4 +31,9 @@ public class AccountService {
     public Optional<Account> retrieveById(Long accountId) {
         return accountRepository.findById(accountId);
     }
+
+    public Account deposit(Account account, Integer depositAmount) {
+        account.deposit(depositAmount);
+        return accountRepository.save(account);
+    }
 }
