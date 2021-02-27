@@ -1,5 +1,6 @@
 package com.kakaopay.moneyswagger.dto;
 
+import com.kakaopay.moneyswagger.entity.member.Member;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,21 +27,33 @@ public class CreateChatRoomDto {
     public static class MemberInfo {
         private Long memberId;
         private String memberName;
+        private String chatRoomId;
 
         @Builder
-        public MemberInfo(Long memberId, String memberName) {
+        public MemberInfo(Long memberId, String memberName, String chatRoomId) {
             this.memberId = memberId;
             this.memberName = memberName;
+            this.chatRoomId = chatRoomId;
+        }
+
+        public static MemberInfo from(Member member) {
+            return MemberInfo.builder()
+                    .memberName(member.getName())
+                    .memberId(member.getId())
+                    .chatRoomId(member.getChatroom().getId())
+                    .build();
         }
     }
 
     @Getter
     @NoArgsConstructor
     public static class Response {
+        private String chatRoomId;
         private List<MemberInfo> memberInfos = new ArrayList<>();
 
         @Builder
-        public Response(List<MemberInfo> memberInfos) {
+        public Response(String chatRoomId, List<MemberInfo> memberInfos) {
+            this.chatRoomId = chatRoomId;
             this.memberInfos = memberInfos;
         }
     }

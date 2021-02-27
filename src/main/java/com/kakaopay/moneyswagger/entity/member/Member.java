@@ -38,4 +38,8 @@ public class Member extends BaseTimeEntity {
     public Member(String name) {
         this.name = name;
     }
+
+    public void joinChatRoom(ChatRoom chatRoom) {
+        this.chatroom = chatRoom;
+    }
 }

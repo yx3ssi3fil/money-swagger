@@ -46,5 +46,9 @@ public class ChatRoomControllerTest extends AbstractControllerTest {
 
         //then
         assertThat(responseBody.getMemberInfos()).hasSize(4);
+        responseBody.getMemberInfos().stream()
+                .forEach(memberInfo -> {
+                    assertThat(memberInfo.getChatRoomId()).isEqualTo(responseBody.getChatRoomId());
+                });
     }
 }
