@@ -2,13 +2,12 @@ package com.kakaopay.moneyswagger.controller;
 
 import com.kakaopay.moneyswagger.AbstractControllerTest;
 import com.kakaopay.moneyswagger.dto.CreateAccountDto;
-import com.kakaopay.moneyswagger.dto.RetrieveAccountDto;
 import com.kakaopay.moneyswagger.dto.DepositDto;
+import com.kakaopay.moneyswagger.dto.RetrieveAccountDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.reactive.server.FluxExchangeResult;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -72,25 +71,13 @@ public class AccountControllerTest extends AbstractControllerTest {
         //given
         Long accountId = accountHttpTest.createAccount(memberId).getAccountId();
         Integer depositAmount = 2000;
-        DepositDto.Request requestBody = DepositDto.Request.builder()
-                .memberId(memberId)
-                .depositAmount(depositAmount)
-                .build();
 
         //when
-        DepositDto.Response responseBody = webTestClient.put().uri(AccountController.URL_DEPOSIT, accountId)
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(requestBody)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(DepositDto.Response.class)
-                .returnResult()
-                .getResponseBody();
+        DepositDto.Response responseBody = accountHttpTest.deposit(accountId, memberId, depositAmount);
 
         //then
         assertThat(responseBody.getAccountId()).isEqualTo(accountId);
-        assertThat(responseBody.getBalance()).isEqualTo(requestBody.getDepositAmount());
+        assertThat(responseBody.getBalance()).isEqualTo(depositAmount);
     }
 
     @DisplayName("입금 - invalid depositAmount")

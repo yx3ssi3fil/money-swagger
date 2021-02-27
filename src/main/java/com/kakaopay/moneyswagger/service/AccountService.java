@@ -32,7 +32,7 @@ public class AccountService {
         return accountRepository.findById(accountId);
     }
 
-    public Account deposit(Account account, Integer depositAmount) {
+    public synchronized Account deposit(Account account, Integer depositAmount) {
         account.deposit(depositAmount);
         return accountRepository.save(account);
     }

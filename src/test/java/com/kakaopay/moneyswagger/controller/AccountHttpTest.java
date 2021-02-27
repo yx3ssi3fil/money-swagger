@@ -1,6 +1,7 @@
 package com.kakaopay.moneyswagger.controller;
 
 import com.kakaopay.moneyswagger.dto.CreateAccountDto;
+import com.kakaopay.moneyswagger.dto.DepositDto;
 import com.kakaopay.moneyswagger.dto.RetrieveAccountDto;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -32,6 +33,23 @@ public class AccountHttpTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(RetrieveAccountDto.Response.class)
+                .returnResult()
+                .getResponseBody();
+    }
+
+    public DepositDto.Response deposit(Long accountId, Long memberId, Integer depositAmount) {
+        DepositDto.Request requestBody = DepositDto.Request.builder()
+                .memberId(memberId)
+                .depositAmount(depositAmount)
+                .build();
+
+        return webTestClient.put().uri(AccountController.URL_DEPOSIT, accountId)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(requestBody)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(DepositDto.Response.class)
                 .returnResult()
                 .getResponseBody();
     }
