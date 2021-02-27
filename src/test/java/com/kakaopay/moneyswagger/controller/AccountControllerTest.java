@@ -35,17 +35,17 @@ public class AccountControllerTest extends AbstractControllerTest {
         assertThat(responseBody.getBalance()).isEqualTo(0);
     }
 
-    @DisplayName("계좌 조회")
+    @DisplayName("계좌 조회(by Id)")
     @Test
     void retrieveAccount() {
         //given
         Long accountId = accountHttpTest.createAccount(memberId).getAccountId();
 
         //when
-        RetrieveAccountDto.Response responseBody = webTestClient.get().uri(AccountController.URL_RETRIEVE_ACCOUNT + "/{id}", accountId)
+        RetrieveAccountDto.Response responseBody = webTestClient.get().uri(AccountController.URL_RETRIEVE_ACCOUNT, accountId)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isCreated()
+                .expectStatus().isOk()
                 .expectBody(RetrieveAccountDto.Response.class)
                 .returnResult()
                 .getResponseBody();
@@ -55,5 +55,17 @@ public class AccountControllerTest extends AbstractControllerTest {
         assertThat(responseBody.getBalance()).isEqualTo(0);
         assertThat(responseBody.getMemberId()).isEqualTo(memberId);
         assertThat(responseBody.getMemberName()).isEqualTo("name");
+    }
+
+    @DisplayName("계좌 조회(by Id) - Invalid accountId")
+    @Test
+    void retrieveByIdWhenInvalidAccountId() {
+        Long accountId = 12345555L;
+
+        //when
+        webTestClient.get().uri(AccountController.URL_RETRIEVE_ACCOUNT, accountId)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 }

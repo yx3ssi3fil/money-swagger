@@ -1,5 +1,6 @@
 package com.kakaopay.moneyswagger.dto;
 
+import com.kakaopay.moneyswagger.entity.account.Account;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,15 @@ public class RetrieveAccountDto {
             this.memberId = memberId;
             this.memberName = memberName;
             this.balance = balance;
+        }
+
+        public static Response from(Account account) {
+            return Response.builder()
+                    .accountId(account.getId())
+                    .balance(account.getBalance().intValue())
+                    .memberId(account.getMember().getId())
+                    .memberName(account.getMember().getName())
+                    .build();
         }
     }
 }

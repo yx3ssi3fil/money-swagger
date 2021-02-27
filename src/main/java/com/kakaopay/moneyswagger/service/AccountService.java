@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 @Slf4j
 @Transactional
@@ -24,5 +25,10 @@ public class AccountService {
                 .build();
 
         return accountRepository.save(account);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Account> retrieveById(Long accountId) {
+        return accountRepository.findById(accountId);
     }
 }

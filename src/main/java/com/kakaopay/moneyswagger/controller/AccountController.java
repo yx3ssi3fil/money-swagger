@@ -1,6 +1,7 @@
 package com.kakaopay.moneyswagger.controller;
 
 import com.kakaopay.moneyswagger.dto.CreateAccountDto;
+import com.kakaopay.moneyswagger.dto.RetrieveAccountDto;
 import com.kakaopay.moneyswagger.entity.account.Account;
 import com.kakaopay.moneyswagger.entity.member.Member;
 import com.kakaopay.moneyswagger.service.AccountService;
@@ -8,9 +9,7 @@ import com.kakaopay.moneyswagger.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.Optional;
@@ -20,7 +19,7 @@ import java.util.Optional;
 @RestController
 public class AccountController {
     public static final String URL_CREATE_ACCOUNT = "/accounts";
-    public static final String URL_RETRIEVE_ACCOUNT = "/accounts/{id}";
+    public static final String URL_RETRIEVE_ACCOUNT = "/accounts/{accountId}";
 
     private final AccountService accountService;
     private final MemberService memberService;
@@ -39,6 +38,22 @@ public class AccountController {
         CreateAccountDto.Response responseBody = CreateAccountDto.Response.from(savedAccount);
         return ResponseEntity
                 .created(URI.create(URL_CREATE_ACCOUNT + "/" + savedAccount.getId()))
+                .body(responseBody);
+    }
+
+    @GetMapping(URL_RETRIEVE_ACCOUNT)
+    public ResponseEntity<RetrieveAccountDto.Response> retrieveById(@PathVariable Long accountId) {
+        Optional<Account> optionalAccount = accountService.retrieveById(accountId);
+        if (optionalAccount.isEmpty()) {
+            return ResponseEntity
+                    .badRequest()
+                    .build();
+        }
+
+        Account account = optionalAccount.get();
+        RetrieveAccountDto.Response responseBody = RetrieveAccountDto.Response.from(account);
+        return ResponseEntity
+                .ok()
                 .body(responseBody);
     }
 }
