@@ -20,6 +20,7 @@ import java.util.Optional;
 public class AccountController {
     public static final String URL_CREATE_ACCOUNT = "/accounts";
     public static final String URL_RETRIEVE_ACCOUNT = "/accounts/{accountId}";
+    public static final String URL_UPDATE_ACCOUNT = "/accounts/{accountId}";
 
     private final AccountService accountService;
     private final MemberService memberService;
