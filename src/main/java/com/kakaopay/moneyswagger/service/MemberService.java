@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Slf4j
 @Transactional
 @RequiredArgsConstructor
@@ -16,5 +18,10 @@ public class MemberService {
 
     public Member createMember(Member member) {
         return memberRepository.save(member);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Member> retrieveMemberById(Long memberId) {
+        return memberRepository.findById(memberId);
     }
 }

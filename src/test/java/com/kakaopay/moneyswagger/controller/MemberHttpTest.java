@@ -15,7 +15,7 @@ public class MemberHttpTest {
         CreateMemberDto.Request requestBody = new CreateMemberDto.Request("name");
 
         return webTestClient
-                .post().uri(MemberController.URL_MEMBERS)
+                .post().uri(MemberController.URL_CREATE_MEMBER)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(requestBody)

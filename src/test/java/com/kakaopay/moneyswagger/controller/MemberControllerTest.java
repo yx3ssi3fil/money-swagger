@@ -7,9 +7,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.web.util.UriBuilder;
-import org.springframework.web.util.UriBuilderFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,10 +40,10 @@ public class MemberControllerTest extends AbstractControllerTest {
 
         //when
         RetrieveMemberDto.Response responseBody = webTestClient
-                .get().uri(MemberController.URL_MEMBERS + "/" + memberId)
+                .get().uri(MemberController.URL_CREATE_MEMBER + "/{id}", memberId)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isCreated()
+                .expectStatus().isOk()
                 .expectBody(RetrieveMemberDto.Response.class)
                 .returnResult()
                 .getResponseBody();
@@ -54,5 +51,16 @@ public class MemberControllerTest extends AbstractControllerTest {
         //then
         assertThat(responseBody.getId()).isNotNull().isNotNegative();
         assertThat(responseBody.getName()).isEqualTo("name");
+    }
+
+    @DisplayName("회원조회 (by id) - Invalid memberId")
+    @Test
+    void retrieveByIdWhenInvalidId() {
+        //when, then
+        webTestClient
+                .get().uri(MemberController.URL_CREATE_MEMBER + "/" + 123444)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 }
