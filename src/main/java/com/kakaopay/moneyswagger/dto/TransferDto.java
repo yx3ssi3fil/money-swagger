@@ -1,5 +1,6 @@
 package com.kakaopay.moneyswagger.dto;
 
+import com.kakaopay.moneyswagger.entity.account.Account;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -56,6 +57,17 @@ public class TransferDto {
             this.receiverName = receiverName;
             this.receiverAccountId = receiverAccountId;
             this.transferAmount = transferAmount;
+        }
+
+        public static Response from(Account giverAfterTransfer, Account receiverAfterTransfer) {
+            return Response.builder()
+                    .giverAccountId(giverAfterTransfer.getId())
+                    .giverBalance(giverAfterTransfer.getBalance().intValue())
+                    .giverMemberId(giverAfterTransfer.getMember().getId())
+                    .giverName(giverAfterTransfer.getMember().getName())
+                    .receiverAccountId(receiverAfterTransfer.getId())
+                    .receiverName(receiverAfterTransfer.getMember().getName())
+                    .build();
         }
     }
 }

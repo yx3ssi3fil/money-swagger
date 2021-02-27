@@ -119,7 +119,6 @@ public class AccountControllerTest extends AbstractControllerTest {
                 .receiverName(receiverAccount.getMemberName())
                 .build();
 
-
         //when
         TransferDto.Response responseBody = webTestClient.put().uri(AccountController.URL_TRANSFER, giverAccount.getAccountId())
                 .accept(MediaType.APPLICATION_JSON)
@@ -133,11 +132,39 @@ public class AccountControllerTest extends AbstractControllerTest {
 
         //then
         assertThat(responseBody.getGiverAccountId()).isEqualTo(giverAccount.getAccountId());
-        assertThat(responseBody.getGiverBalance()).isEqualTo(giverAccount.getBalance() - transferAmount);
+        assertThat(responseBody.getGiverBalance()).isEqualTo(100000 - transferAmount);
         assertThat(responseBody.getReceiverAccountId()).isEqualTo(receiverAccount.getAccountId());
         assertThat(responseBody.getReceiverName()).isEqualTo(receiverAccount.getMemberName());
 
         RetrieveAccountDto.Response receiverAccountAfterTransfer = accountHttpTest.retrieveAccount(receiverAccount.getAccountId());
         assertThat(receiverAccountAfterTransfer.getBalance()).isEqualTo(transferAmount);
+    }
+
+    @DisplayName("계좌이체 - 송금인 잔고부족")
+    @Test
+    void withdrawWhenInsufficientGiverBalance() {
+        //given
+        CreateMemberDto.Response giver = memberHttpTest.createMember("giver");
+        CreateAccountDto.Response giverAccount = accountHttpTest.createAccount(giver.getId());
+        accountHttpTest.deposit(giverAccount.getAccountId(), giver.getId(), 1000);
+        CreateMemberDto.Response receiver = memberHttpTest.createMember("receiver");
+        CreateAccountDto.Response receiverAccount = accountHttpTest.createAccount(receiver.getId());
+        Integer transferAmount = 20000;
+
+        TransferDto.Request requestBody = TransferDto.Request.builder()
+                .transferAmount(transferAmount)
+                .giverName(giver.getName())
+                .giverMemberId(giver.getId())
+                .receiverAccountId(receiverAccount.getAccountId())
+                .receiverName(receiverAccount.getMemberName())
+                .build();
+
+        //when
+        webTestClient.put().uri(AccountController.URL_TRANSFER, giverAccount.getAccountId())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(requestBody)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 }
