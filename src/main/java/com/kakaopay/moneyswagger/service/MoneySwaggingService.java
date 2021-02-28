@@ -15,6 +15,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -84,10 +85,23 @@ public class MoneySwaggingService {
         return availableMoneyPortion;
     }
 
-    public List<MoneyPortion> getAvailableMoneyPortions(MoneySwagging moneySwagging) {
-        return moneySwagging.getMoneyPortions().stream()
+    public List<MoneyPortion> getAvailableMoneyPortions(MoneySwagging moneySwagging, Long userId) {
+        List<MoneyPortion> moneyPortions = moneySwagging.getMoneyPortions();
+
+        if (isAgainAcceptance(moneyPortions, userId)) {
+            return Collections.emptyList();
+        }
+
+        return moneyPortions.stream()
                 .filter(moneyPortion -> !moneyPortion.isReceived())
                 .collect(Collectors.toList());
+    }
+
+    private Boolean isAgainAcceptance(List<MoneyPortion> moneyPortions, Long userId) {
+        return moneyPortions.stream()
+                .filter(MoneyPortion::isReceived)
+                .anyMatch(moneyPortion -> moneyPortion.getReceiver().getId().equals(userId));
+
     }
 
     private MoneySwagging makeMoneySwagging(CreateMoneySwaggingDto.Request request, Member giver, ChatRoom chatRoom) {

@@ -112,7 +112,7 @@ public class MoneySwaggingController {
                     .build();
         }
 
-        List<MoneyPortion> moneyPortions = moneySwaggingService.getAvailableMoneyPortions(moneySwagging);
+        List<MoneyPortion> moneyPortions = moneySwaggingService.getAvailableMoneyPortions(moneySwagging, userId);
         if (moneyPortions.isEmpty()) {
             return ResponseEntity
                     .badRequest()
