@@ -20,10 +20,12 @@ public class MoneySwagging extends BaseTimeEntity {
 
     private String token;
 
-    @OneToOne(mappedBy = "chat_room_id")
+    @OneToOne
+    @JoinColumn(name = "chat_room_id")
     private ChatRoom chatRoom;
 
-    @OneToOne(mappedBy = "member_id")
+    @OneToOne
+    @JoinColumn(name = "member_id")
     private Member member;
 
     @Builder
