@@ -40,4 +40,10 @@ public class MoneyPortion extends BaseTimeEntity {
         this.receiver = receiver;
         this.amount = amount;
     }
+
+    public MoneyPortion(MoneySwagging moneySwagging, Integer amount) {
+        this.moneySwagging = moneySwagging;
+        this.chatRoom = moneySwagging.getChatRoom();
+        this.amount = amount;
+    }
 }

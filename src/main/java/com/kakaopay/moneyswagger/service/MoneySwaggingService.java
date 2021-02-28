@@ -12,17 +12,21 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Slf4j
 @Transactional
 @RequiredArgsConstructor
 @Service
 public class MoneySwaggingService {
+    private static final Integer THREE_DIGITS = 3;
+
     private final MoneySwaggingRepository moneySwaggingRepository;
     private final MoneyPortionRepository moneyPortionRepository;
 
     public MoneySwagging createMoneySwagging(MoneySwagging moneySwagging) {
-        String token = RandomStringUtils.randomAlphabetic(3);
+        String token = RandomStringUtils.randomAlphabetic(THREE_DIGITS);
         moneySwagging.assignToken(token);
         List<MoneyPortion> allMoneyPortion = createAllMoneyPortion(moneySwagging);
         moneySwagging.assignMoneyPortions(allMoneyPortion);
@@ -37,22 +41,10 @@ public class MoneySwaggingService {
         int base = amount / peopleCount;
         int bonus = amount % peopleCount;
 
-        List<MoneyPortion> moneyPortions = new ArrayList<>();
-        for (int i = 0; i < peopleCount - 1; i++) {
-            MoneyPortion moneyPortion = MoneyPortion.builder()
-                    .moneySwagging(moneySwagging)
-                    .chatRoom(moneySwagging.getChatRoom())
-                    .amount(base)
-                    .build();
-            moneyPortions.add(moneyPortion);
-        }
-
-        MoneyPortion moneyPortion = MoneyPortion.builder()
-                .moneySwagging(moneySwagging)
-                .chatRoom(moneySwagging.getChatRoom())
-                .amount(base + bonus)
-                .build();
-        moneyPortions.add(moneyPortion);
+        List<MoneyPortion> moneyPortions = IntStream.range(1, peopleCount)
+                .mapToObj(num -> new MoneyPortion(moneySwagging, base))
+                .collect(Collectors.toList());
+        moneyPortions.add(new MoneyPortion(moneySwagging, base + bonus));
 
         return moneyPortionRepository.saveAll(moneyPortions);
     }
