@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.net.URI;
 import java.util.Optional;
 
 @Slf4j
@@ -61,10 +62,16 @@ public class MoneySwaggingController {
         }
 
         MoneySwagging moneySwagging = MoneySwagging.builder()
+                .amount(request.getAmount())
                 .member(optionalGiver.get())
                 .chatRoom(optionalChatRoom.get())
+                .peopleCount(request.getPeopleCount())
                 .build();
         MoneySwagging savedMoneySwagging = moneySwaggingService.createMoneySwagging(moneySwagging);
-        return null;
+        CreateMoneySwaggingDto.Response responseBody = CreateMoneySwaggingDto.Response.from(savedMoneySwagging);
+
+        return ResponseEntity
+                .created(URI.create(URL_CREATE_MONEY_SWAGGING + "/" + savedMoneySwagging.getId()))
+                .body(responseBody);
     }
 }

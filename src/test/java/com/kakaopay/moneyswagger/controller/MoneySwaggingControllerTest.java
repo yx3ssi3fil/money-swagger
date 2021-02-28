@@ -90,12 +90,8 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
 
         //then
         assert responseBody != null;
+        assertThat(responseBody.getMoneySwaggingId()).isNotNull();
         assertThat(responseBody.getToken().length()).isEqualTo(3);
         assertThat(responseBody.getCreatedTime()).isBefore(LocalDateTime.now());
-        assertThat(responseBody.getDividedAmounts()).hasSize(peopleCount);
-        int sum = responseBody.getDividedAmounts().stream()
-                .mapToInt(Integer::intValue)
-                .sum();
-        assertThat(sum).isEqualTo(amount);
     }
 }

@@ -30,11 +30,14 @@ public class MoneyPortion extends BaseTimeEntity {
     @JoinColumn(name = "member_id")
     private Member receiver;
 
+    private Integer amount;
+
     @Builder
-    public MoneyPortion(Long id, MoneySwagging moneySwagging, ChatRoom chatRoom, Member receiver) {
+    public MoneyPortion(Long id, MoneySwagging moneySwagging, ChatRoom chatRoom, Member receiver, Integer amount) {
         this.id = id;
         this.moneySwagging = moneySwagging;
         this.chatRoom = chatRoom;
         this.receiver = receiver;
+        this.amount = amount;
     }
 }

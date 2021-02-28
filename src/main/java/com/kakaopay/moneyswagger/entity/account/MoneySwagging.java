@@ -24,23 +24,37 @@ public class MoneySwagging extends BaseTimeEntity {
 
     private Integer amount;
 
+    private Integer peopleCount;
+
+    @OneToMany
+    @JoinColumn(name = "moneySwagging")
+    private List<MoneyPortion> moneyPortions = new ArrayList<>();
+
     @OneToOne
     @JoinColumn(name = "chat_room_id")
     private ChatRoom chatRoom;
 
     @OneToOne
     @JoinColumn(name = "member_id")
-    private Member member;
+    private Member member; //given
 
     @Builder
-    public MoneySwagging(Long id, String token, ChatRoom chatRoom, Member member) {
+    public MoneySwagging(Long id, String token, Integer amount, Integer peopleCount,
+                         List<MoneyPortion> moneyPortions, ChatRoom chatRoom, Member member) {
         this.id = id;
         this.token = token;
+        this.amount = amount;
+        this.peopleCount = peopleCount;
+        this.moneyPortions = moneyPortions;
         this.chatRoom = chatRoom;
         this.member = member;
     }
 
     public void assignToken(String token) {
         this.token = token;
+    }
+
+    public void assignMoneyPortions(List<MoneyPortion> moneyPortions) {
+        this.moneyPortions =  moneyPortions;
     }
 }
