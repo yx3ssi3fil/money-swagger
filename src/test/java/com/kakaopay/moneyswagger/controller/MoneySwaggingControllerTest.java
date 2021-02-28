@@ -4,6 +4,7 @@ import com.kakaopay.moneyswagger.AbstractControllerTest;
 import com.kakaopay.moneyswagger.dto.*;
 import com.kakaopay.moneyswagger.entity.Header;
 import org.junit.jupiter.api.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.time.LocalDateTime;
@@ -43,7 +44,7 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         makeTestData();
     }
 
-    @DisplayName("[과제 1번] 뿌리기 API - 뿌리기 성공")
+    @DisplayName("[과제 1번] 뿌리기 API - 뿌리기 성공 ")
     @Test
     @Order(1)
     void createMoneySwagging() {
@@ -76,7 +77,7 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         MoneyAcceptanceDto.Request requestBody = new MoneyAcceptanceDto.Request(token);
 
         //when
-        MoneyAcceptanceDto.Response responseBody = moneySwaggingHttpTest.acceptMoney(chatRoomId, userId, requestBody);
+        MoneyAcceptanceDto.Response responseBody = moneySwaggingHttpTest.acceptMoney(chatRoomId, userId, requestBody, HttpStatus.OK);
 
         //then
         assertThat(responseBody.getReceiveAmount()).isGreaterThan(0);
@@ -92,19 +93,13 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         String chatRoomId = chatRoom.getChatRoomId();
         String token = moneySwaggingHttpTest.create(amount, peopleCount, chatRoomId, giver.getId()).getToken();
         MoneyAcceptanceDto.Request requestBody = new MoneyAcceptanceDto.Request(token);
-        moneySwaggingHttpTest.acceptMoney(chatRoomId, member1.getId(), requestBody);
-        moneySwaggingHttpTest.acceptMoney(chatRoomId, member2.getId(), requestBody);
-        moneySwaggingHttpTest.acceptMoney(chatRoomId, member3.getId(), requestBody);
+        moneySwaggingHttpTest.acceptMoney(chatRoomId, member1.getId(), requestBody, HttpStatus.OK);
+        moneySwaggingHttpTest.acceptMoney(chatRoomId, member2.getId(), requestBody, HttpStatus.OK);
+        moneySwaggingHttpTest.acceptMoney(chatRoomId, member3.getId(), requestBody, HttpStatus.OK);
 
         //when
-        webTestClient.post().uri(MoneySwaggingController.URL_ACCEPT_MONEY)
-                .header(Header.CHAT_ROOM_ID.getKey(), chatRoomId)
-                .header(Header.USER_ID.getKey(), String.valueOf(member4.getId()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .bodyValue(requestBody)
-                .exchange()
-                .expectStatus().isBadRequest();
+        moneySwaggingHttpTest.acceptMoney(chatRoomId, member4.getId(), requestBody, HttpStatus.BAD_REQUEST);
+
     }
 
     @DisplayName("[과제 2번] 받기 API - 받기 실패(이미 받아간 사람이 다시 받으려고 함)")
@@ -117,17 +112,10 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         String chatRoomId = chatRoom.getChatRoomId();
         String token = moneySwaggingHttpTest.create(amount, peopleCount, chatRoomId, giver.getId()).getToken();
         MoneyAcceptanceDto.Request requestBody = new MoneyAcceptanceDto.Request(token);
-        moneySwaggingHttpTest.acceptMoney(chatRoomId, member1.getId(), requestBody);
+        moneySwaggingHttpTest.acceptMoney(chatRoomId, member1.getId(), requestBody, HttpStatus.OK);
 
         //when, then
-        webTestClient.post().uri(MoneySwaggingController.URL_ACCEPT_MONEY)
-                .header(Header.CHAT_ROOM_ID.getKey(), chatRoomId)
-                .header(Header.USER_ID.getKey(), String.valueOf(member1.getId()))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .bodyValue(requestBody)
-                .exchange()
-                .expectStatus().isBadRequest();
+        moneySwaggingHttpTest.acceptMoney(chatRoomId, member1.getId(), requestBody, HttpStatus.BAD_REQUEST);
     }
 
     @DisplayName("[과제 2번] 받기 API - 받기 실패(채팅방 참여자 중 뿌린 사람)")
