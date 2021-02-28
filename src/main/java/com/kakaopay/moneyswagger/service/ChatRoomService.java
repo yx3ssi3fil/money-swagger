@@ -41,4 +41,8 @@ public class ChatRoomService {
         return chatRoom;
     }
 
+    public Optional<ChatRoom> retrieveById(String chatRoomId) {
+        return chatRoomRepository.findById(chatRoomId);
+    }
+
 }

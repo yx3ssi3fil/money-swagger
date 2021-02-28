@@ -4,7 +4,7 @@ import com.kakaopay.moneyswagger.AbstractControllerTest;
 import com.kakaopay.moneyswagger.dto.CreateAccountDto;
 import com.kakaopay.moneyswagger.dto.CreateChatRoomDto;
 import com.kakaopay.moneyswagger.dto.CreateMemberDto;
-import com.kakaopay.moneyswagger.dto.MoneySwaggingDto;
+import com.kakaopay.moneyswagger.dto.CreateMoneySwaggingDto;
 import com.kakaopay.moneyswagger.entity.Header;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,13 +69,13 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         String chatRoomId = chatRoom.getChatRoomId();
         Long userId = giver.getId();
 
-        MoneySwaggingDto.Request requestBody = MoneySwaggingDto.Request.builder()
+        CreateMoneySwaggingDto.Request requestBody = CreateMoneySwaggingDto.Request.builder()
                 .amount(amount)
                 .peopleCount(peopleCount)
                 .build();
 
         //when
-        MoneySwaggingDto.Response responseBody = webTestClient
+        CreateMoneySwaggingDto.Response responseBody = webTestClient
                 .post().uri(MoneySwaggingController.URL_CREATE_MONEY_SWAGGING)
                 .header(Header.CHAT_ROOM_ID.getKey(), chatRoomId)
                 .header(Header.USER_ID.getKey(), String.valueOf(userId))
@@ -84,7 +84,7 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
                 .bodyValue(requestBody)
                 .exchange()
                 .expectStatus().isCreated()
-                .expectBody(MoneySwaggingDto.Response.class)
+                .expectBody(CreateMoneySwaggingDto.Response.class)
                 .returnResult()
                 .getResponseBody();
 

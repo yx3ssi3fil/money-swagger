@@ -8,21 +8,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
-@Getter
 @NoArgsConstructor
+@Getter
 @Entity
-public class MoneySwagging extends BaseTimeEntity {
+public class MoneyPortion extends BaseTimeEntity {
     @Id
-    @GeneratedValue
-    @Column(name = "money_swagging_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "money_portion_id")
     private Long id;
 
-    private String token;
-
-    private Integer amount;
+    @ManyToOne
+    @JoinColumn(name = "money_swagging_id")
+    private MoneySwagging moneySwagging;
 
     @OneToOne
     @JoinColumn(name = "chat_room_id")
@@ -30,17 +28,13 @@ public class MoneySwagging extends BaseTimeEntity {
 
     @OneToOne
     @JoinColumn(name = "member_id")
-    private Member member;
+    private Member receiver;
 
     @Builder
-    public MoneySwagging(Long id, String token, ChatRoom chatRoom, Member member) {
+    public MoneyPortion(Long id, MoneySwagging moneySwagging, ChatRoom chatRoom, Member receiver) {
         this.id = id;
-        this.token = token;
+        this.moneySwagging = moneySwagging;
         this.chatRoom = chatRoom;
-        this.member = member;
-    }
-
-    public void assignToken(String token) {
-        this.token = token;
+        this.receiver = receiver;
     }
 }
