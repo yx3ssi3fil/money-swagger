@@ -62,7 +62,29 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         assertThat(responseBody.getCreatedTime()).isBefore(LocalDateTime.now());
     }
 
-    @DisplayName("[과제 2번] 조회 API - 뿌린 사람이 조회")
+    @DisplayName("[과제 2번] 받기 API - 받기 (뿌린 사람)")
+    @Test
+    void acceptByGiver() {
+        //given
+        Integer amount = 1_000_000;
+        Integer peopleCount = 3;
+        String chatRoomId = chatRoom.getChatRoomId();
+        Long userId = giver.getId();
+        String token = moneySwaggingHttpTest.create(amount, peopleCount, chatRoomId, giver.getId()).getToken();
+        MoneyAcceptanceDto.Request requestBody = new MoneyAcceptanceDto.Request(token);
+
+        //when
+        webTestClient.post().uri(MoneySwaggingController.URL_RECEIVE_MONEY)
+                .header(Header.CHAT_ROOM_ID.getKey(), chatRoomId)
+                .header(Header.USER_ID.getKey(), String.valueOf(userId))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(requestBody)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @DisplayName("[과제 3번] 조회 API - 뿌린 사람이 조회")
     @Test
     void retrieveMoneySwagging() {
         // given
@@ -82,7 +104,7 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         assertThat(responseBody.getMoneySwaggingTime()).isBefore(LocalDateTime.now());
     }
 
-    @DisplayName("[과제 2번] 조회 API - 뿌리지 않은 사람이 조회")
+    @DisplayName("[과제 3번] 조회 API - 뿌리지 않은 사람이 조회")
     @Test
     void retrieveMoneySwaggingByReceiver() {
         // given

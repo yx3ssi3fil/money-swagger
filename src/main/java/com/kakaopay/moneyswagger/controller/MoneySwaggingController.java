@@ -23,7 +23,9 @@ import java.util.Optional;
 @RestController
 public class MoneySwaggingController {
     public static final String URL_CREATE_MONEY_SWAGGING = "/money-swaggings";
-    public static final String URL_RETRIEVE_MONEY_SWAGGING = "/moeny-swaggings/{id]";
+    public static final String URL_RETRIEVE_MONEY_SWAGGING = "/moeny-swaggings/{id}";
+    public static final String URL_RECEIVE_MONEY = "/money-swaggings/acceptances";
+
 
     private final MoneySwaggingService moneySwaggingService;
 
