@@ -1,6 +1,7 @@
 package com.kakaopay.moneyswagger.controller;
 
 import com.kakaopay.moneyswagger.dto.CreateMoneySwaggingDto;
+import com.kakaopay.moneyswagger.dto.RetrieveMoneySwaggingDto;
 import com.kakaopay.moneyswagger.entity.Header;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -28,6 +29,18 @@ public class MoneySwaggingHttpTest {
                 .exchange()
                 .expectStatus().isCreated()
                 .expectBody(CreateMoneySwaggingDto.Response.class)
+                .returnResult()
+                .getResponseBody();
+    }
+
+    public RetrieveMoneySwaggingDto.Response retrieveByGiver(String chatRoomId, String token, Long userId) {
+        return webTestClient.get().uri(MoneySwaggingController.URL_RETRIEVE_MONEY_SWAGGING + "?token=" + token)
+                .header(Header.CHAT_ROOM_ID.getKey(), chatRoomId)
+                .header(Header.USER_ID.getKey(), String.valueOf(userId))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(RetrieveMoneySwaggingDto.Response.class)
                 .returnResult()
                 .getResponseBody();
     }
