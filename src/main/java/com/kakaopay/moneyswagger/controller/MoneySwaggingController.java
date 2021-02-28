@@ -4,8 +4,6 @@ import com.kakaopay.moneyswagger.dto.CreateMoneySwaggingDto;
 import com.kakaopay.moneyswagger.dto.MoneyAcceptanceDto;
 import com.kakaopay.moneyswagger.dto.RetrieveMoneySwaggingDto;
 import com.kakaopay.moneyswagger.entity.Header;
-import com.kakaopay.moneyswagger.entity.TransferRole;
-import com.kakaopay.moneyswagger.entity.account.Account;
 import com.kakaopay.moneyswagger.entity.account.MoneyPortion;
 import com.kakaopay.moneyswagger.entity.account.MoneySwagging;
 import com.kakaopay.moneyswagger.entity.member.Member;
@@ -21,7 +19,6 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
