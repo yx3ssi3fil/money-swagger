@@ -74,7 +74,7 @@ public class MoneySwaggingController {
     @PostMapping(URL_ACCEPT_MONEY)
     public ResponseEntity<MoneyAcceptanceDto.Response> acceptMoney(HttpServletRequest httpServletRequest,
                                                                    @RequestBody MoneyAcceptanceDto.Request request) {
-        String userId = getHeader(Header.USER_ID, httpServletRequest);
+        String strUserId = getHeader(Header.USER_ID, httpServletRequest);
         String token = request.getToken();
         Optional<MoneySwagging> optionalMoneySwagging = moneySwaggingService.retrieveByToken(token);
 
@@ -86,8 +86,16 @@ public class MoneySwaggingController {
 
         MoneySwagging moneySwagging = optionalMoneySwagging.get();
         Long moneySwaggerId = moneySwagging.getMember().getId();
+        Long userId = Long.valueOf(strUserId);
 
-        if (moneySwaggerId == Long.valueOf(userId)) {
+        if (moneySwaggerId == userId) {
+            return ResponseEntity
+                    .badRequest()
+                    .build();
+        }
+
+        Boolean isMember = moneySwaggingService.isChatRoomMember(userId, moneySwagging);
+        if (!isMember) {
             return ResponseEntity
                     .badRequest()
                     .build();

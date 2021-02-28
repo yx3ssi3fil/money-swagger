@@ -73,7 +73,7 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         String token = moneySwaggingHttpTest.create(amount, peopleCount, chatRoomId, giver.getId()).getToken();
         MoneyAcceptanceDto.Request requestBody = new MoneyAcceptanceDto.Request(token);
 
-        //when
+        //when, then
         webTestClient.post().uri(MoneySwaggingController.URL_ACCEPT_MONEY)
                 .header(Header.CHAT_ROOM_ID.getKey(), chatRoomId)
                 .header(Header.USER_ID.getKey(), String.valueOf(userId))
@@ -96,7 +96,7 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         String token = moneySwaggingHttpTest.create(amount, peopleCount, chatRoomId, giver.getId()).getToken();
         MoneyAcceptanceDto.Request requestBody = new MoneyAcceptanceDto.Request(token);
 
-        //when
+        //when, then
         webTestClient.post().uri(MoneySwaggingController.URL_ACCEPT_MONEY)
                 .header(Header.CHAT_ROOM_ID.getKey(), chatRoomId)
                 .header(Header.USER_ID.getKey(), String.valueOf(userId))

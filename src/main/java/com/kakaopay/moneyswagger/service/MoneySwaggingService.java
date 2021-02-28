@@ -57,6 +57,13 @@ public class MoneySwaggingService {
         return moneySwaggingRepository.findByToken(token);
     }
 
+    public Boolean isChatRoomMember(Long userId, MoneySwagging moneySwagging) {
+        ChatRoom chatRoom = moneySwagging.getChatRoom();
+        return chatRoom.getMembers()
+                .stream()
+                .anyMatch(member -> userId == member.getId());
+    }
+
     private MoneySwagging makeMoneySwagging(CreateMoneySwaggingDto.Request request, Member giver, ChatRoom chatRoom) {
         return MoneySwagging.builder()
                 .amount(request.getAmount())
