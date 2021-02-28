@@ -104,6 +104,28 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
                 .expectStatus().isBadRequest();
     }
 
+    @DisplayName("[과제 2번] 받기 API - 받기 실패(이미 받아간 사람이 다시 받으려고 함))")
+    @Test
+    void acceptByMemberWhenAgainAccept() {
+        //given
+        Integer amount = 1_000_000;
+        Integer peopleCount = 3;
+        String chatRoomId = chatRoom.getChatRoomId();
+        String token = moneySwaggingHttpTest.create(amount, peopleCount, chatRoomId, giver.getId()).getToken();
+        MoneyAcceptanceDto.Request requestBody = new MoneyAcceptanceDto.Request(token);
+        moneySwaggingHttpTest.acceptMoney(chatRoomId, member1.getId(), requestBody);
+
+        //when
+        webTestClient.post().uri(MoneySwaggingController.URL_ACCEPT_MONEY)
+                .header(Header.CHAT_ROOM_ID.getKey(), chatRoomId)
+                .header(Header.USER_ID.getKey(), String.valueOf(member1.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(requestBody)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
     @DisplayName("[과제 2번] 받기 API - 받기 실패(채팅방 참여자 중 뿌린 사람)")
     @Test
     void acceptByGiver() {
