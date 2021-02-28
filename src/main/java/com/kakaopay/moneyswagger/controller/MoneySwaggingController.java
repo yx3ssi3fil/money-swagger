@@ -20,6 +20,7 @@ import java.net.URI;
 @RestController
 public class MoneySwaggingController {
     public static final String URL_CREATE_MONEY_SWAGGING = "/money-swaggings";
+    public static final String URL_RETRIEVE_MONEY_SWAGGING = "/moeny-swaggings/{id]";
 
     private final MoneySwaggingService moneySwaggingService;
 

@@ -1,13 +1,12 @@
 package com.kakaopay.moneyswagger.controller;
 
 import com.kakaopay.moneyswagger.AbstractControllerTest;
-import com.kakaopay.moneyswagger.dto.CreateAccountDto;
-import com.kakaopay.moneyswagger.dto.CreateChatRoomDto;
-import com.kakaopay.moneyswagger.dto.CreateMemberDto;
-import com.kakaopay.moneyswagger.dto.CreateMoneySwaggingDto;
+import com.kakaopay.moneyswagger.dto.*;
+import com.kakaopay.moneyswagger.entity.Header;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -61,6 +60,35 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         assertThat(responseBody.getMoneySwaggingId()).isNotNull();
         assertThat(responseBody.getToken().length()).isEqualTo(3);
         assertThat(responseBody.getCreatedTime()).isBefore(LocalDateTime.now());
+    }
+
+    @DisplayName("[과제 2번] 조회 API - 뿌린 사람이 조회")
+    @Test
+    void retrieveMoneySwagging() {
+        // given
+        Integer amount = 1_000_000;
+        Integer peopleCount = 3;
+        String chatRoomId = chatRoom.getChatRoomId();
+        Long userId = giver.getId();
+        String token = moneySwaggingHttpTest.create(amount, peopleCount, chatRoomId, userId).getToken();
+
+
+        //when
+        RetrieveMoneySwaggingDto.Response responseBody = webTestClient.get().uri(MoneySwaggingController.URL_RETRIEVE_MONEY_SWAGGING + "?token=" + token)
+                .header(Header.CHAT_ROOM_ID.getKey(), chatRoomId)
+                .header(Header.USER_ID.getKey(), String.valueOf(userId))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(RetrieveMoneySwaggingDto.Response.class)
+                .returnResult()
+                .getResponseBody();
+
+        //then
+        assertThat(responseBody.getMoneySwaggingAmount()).isEqualTo(amount);
+        assertThat(responseBody.getCompletedAmount()).isEqualTo(0);
+        assertThat(responseBody.getCompletedInfos()).isNull();
+        assertThat(responseBody.getMoneySwaggingTime()).isBefore(LocalDateTime.now());
     }
 
     private void makeTestData() {
