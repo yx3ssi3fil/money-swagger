@@ -70,8 +70,7 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         Integer peopleCount = 3;
         String chatRoomId = chatRoom.getChatRoomId();
         Long userId = giver.getId();
-        String token = moneySwaggingHttpTest.create(amount, peopleCount, chatRoomId, userId).getToken();
-
+        String token = moneySwaggingHttpTest.create(amount, peopleCount, chatRoomId, giver.getId()).getToken();
 
         //when
         RetrieveMoneySwaggingDto.Response responseBody =
@@ -100,7 +99,7 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         Integer peopleCount = 3;
         String chatRoomId = chatRoom.getChatRoomId();
         Long userId = member1.getId();
-        String token = moneySwaggingHttpTest.create(amount, peopleCount, chatRoomId, userId).getToken();
+        String token = moneySwaggingHttpTest.create(amount, peopleCount, chatRoomId, giver.getId()).getToken();
 
         //when, then
         webTestClient.get().uri(MoneySwaggingController.URL_RETRIEVE_MONEY_SWAGGING + "?token=" + token)

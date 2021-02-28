@@ -3,8 +3,8 @@ package com.kakaopay.moneyswagger.controller;
 import com.kakaopay.moneyswagger.dto.CreateMoneySwaggingDto;
 import com.kakaopay.moneyswagger.dto.RetrieveMoneySwaggingDto;
 import com.kakaopay.moneyswagger.entity.Header;
-import com.kakaopay.moneyswagger.entity.account.MoneyPortion;
 import com.kakaopay.moneyswagger.entity.account.MoneySwagging;
+import com.kakaopay.moneyswagger.entity.member.Member;
 import com.kakaopay.moneyswagger.service.MoneySwaggingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.List;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Slf4j
@@ -47,7 +47,7 @@ public class MoneySwaggingController {
     }
 
     @GetMapping(URL_RETRIEVE_MONEY_SWAGGING)
-    public ResponseEntity<RetrieveMoneySwaggingDto.Response> retrieveByToken(@RequestParam(name = "token") String token) {
+    public ResponseEntity<RetrieveMoneySwaggingDto.Response> retrieveByToken(HttpServletRequest request, @RequestParam(name = "token") String token) {
         Optional<MoneySwagging> optionalMoneySwagging = moneySwaggingService.retrieveByToken(token);
         if (optionalMoneySwagging.isEmpty()) {
             return ResponseEntity
@@ -56,6 +56,23 @@ public class MoneySwaggingController {
         }
 
         MoneySwagging moneySwagging = optionalMoneySwagging.get();
+        String userId = getHeader(Header.USER_ID, request);
+        Member moneySwagger = moneySwagging.getMember();
+        if (Long.valueOf(userId) != moneySwagger.getId()) {
+            return ResponseEntity
+                    .badRequest()
+                    .build();
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime createdDate = moneySwagger.getCreatedDate();
+        LocalDateTime sevenDaysAgo = now.minusDays(7);
+        if (createdDate.isBefore(sevenDaysAgo)) {
+            return ResponseEntity
+                    .badRequest()
+                    .build();
+        }
+
         RetrieveMoneySwaggingDto.Response responseBody = RetrieveMoneySwaggingDto.Response.from(moneySwagging);
         return ResponseEntity
                 .ok(responseBody);
