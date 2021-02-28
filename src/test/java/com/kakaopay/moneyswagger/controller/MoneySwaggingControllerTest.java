@@ -62,7 +62,7 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         assertThat(responseBody.getCreatedTime()).isBefore(LocalDateTime.now());
     }
 
-    @DisplayName("[과제 2번] 받기 API - 받기 (채팅방 참여자 중 뿌리지 않은 사람)")
+    @DisplayName("[과제 2번] 받기 API - 받기 성공(채팅방 참여자 중 뿌리지 않은 사람)")
     @Test
     void acceptByMember() {
         //given
@@ -74,23 +74,37 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         MoneyAcceptanceDto.Request requestBody = new MoneyAcceptanceDto.Request(token);
 
         //when
-        MoneyAcceptanceDto.Response responseBody = webTestClient.post().uri(MoneySwaggingController.URL_ACCEPT_MONEY)
-                .header(Header.CHAT_ROOM_ID.getKey(), chatRoomId)
-                .header(Header.USER_ID.getKey(), String.valueOf(userId))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .bodyValue(requestBody)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(MoneyAcceptanceDto.Response.class)
-                .returnResult()
-                .getResponseBody();
+        MoneyAcceptanceDto.Response responseBody = moneySwaggingHttpTest.acceptMoney(chatRoomId, userId, requestBody);
 
         //then
         assertThat(responseBody.getReceiveAmount()).isGreaterThan(0);
     }
 
-    @DisplayName("[과제 2번] 받기 API - 받기 (뿌린 사람)")
+    @DisplayName("[과제 2번] 받기 API - 받기 실패(이미 받기 인원이 다 찼음))")
+    @Test
+    void acceptByMemberWhenItIsFull() {
+        //given
+        Integer amount = 1_000_000;
+        Integer peopleCount = 3;
+        String chatRoomId = chatRoom.getChatRoomId();
+        String token = moneySwaggingHttpTest.create(amount, peopleCount, chatRoomId, giver.getId()).getToken();
+        MoneyAcceptanceDto.Request requestBody = new MoneyAcceptanceDto.Request(token);
+        moneySwaggingHttpTest.acceptMoney(chatRoomId, member1.getId(), requestBody);
+        moneySwaggingHttpTest.acceptMoney(chatRoomId, member2.getId(), requestBody);
+        moneySwaggingHttpTest.acceptMoney(chatRoomId, member3.getId(), requestBody);
+
+        //when
+        webTestClient.post().uri(MoneySwaggingController.URL_ACCEPT_MONEY)
+                .header(Header.CHAT_ROOM_ID.getKey(), chatRoomId)
+                .header(Header.USER_ID.getKey(), String.valueOf(member4.getId()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(requestBody)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @DisplayName("[과제 2번] 받기 API - 받기 실패(채팅방 참여자 중 뿌린 사람)")
     @Test
     void acceptByGiver() {
         //given
@@ -112,7 +126,7 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
                 .expectStatus().isBadRequest();
     }
 
-    @DisplayName("[과제 2번] 받기 API - 받기 (채팅방 참여자가 아닌 사람)")
+    @DisplayName("[과제 2번] 받기 API - 받기 실패(채팅방 참여자가 아닌 사람)")
     @Test
     void acceptByNotMemberOfChatRoom() {
         //given
