@@ -5,10 +5,9 @@ import com.kakaopay.moneyswagger.dto.CreateAccountDto;
 import com.kakaopay.moneyswagger.dto.CreateChatRoomDto;
 import com.kakaopay.moneyswagger.dto.CreateMemberDto;
 import com.kakaopay.moneyswagger.dto.CreateMoneySwaggingDto;
-import com.kakaopay.moneyswagger.entity.Header;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,6 +19,7 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
     private AccountHttpTest accountHttpTest;
     private MemberHttpTest memberHttpTest;
     private ChatRoomHttpTest chatRoomHttpTest;
+    private MoneySwaggingHttpTest moneySwaggingHttpTest;
 
     private static CreateMemberDto.Response member1;
     private static CreateMemberDto.Response member2;
@@ -40,27 +40,11 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         accountHttpTest = new AccountHttpTest(webTestClient);
         memberHttpTest = new MemberHttpTest(webTestClient);
         chatRoomHttpTest = new ChatRoomHttpTest(webTestClient);
-
-        member1 = memberHttpTest.createMember("member1");
-        member2 = memberHttpTest.createMember("member2");
-        member3 = memberHttpTest.createMember("member3");
-        member4 = memberHttpTest.createMember("member4");
-        giver = memberHttpTest.createMember("giver");
-        account1 = accountHttpTest.createAccount(member1.getId());
-        account2 = accountHttpTest.createAccount(member2.getId());
-        account3 = accountHttpTest.createAccount(member3.getId());
-        account4 = accountHttpTest.createAccount(member4.getId());
-        giverAccount = accountHttpTest.createAccount(giver.getId());
-        accountHttpTest.deposit(account1.getAccountId(), member1.getId(), 1_000_000_000);
-        accountHttpTest.deposit(account2.getAccountId(), member2.getId(), 1_000_000_000);
-        accountHttpTest.deposit(account3.getAccountId(), member3.getId(), 1_000_000_000);
-        accountHttpTest.deposit(account4.getAccountId(), member4.getId(), 1_000_000_000);
-        accountHttpTest.deposit(giverAccount.getAccountId(), giver.getId(), 1_000_000_000);
-
-        memberIds = List.of(giver.getId(), member1.getId(), member2.getId(), member3.getId(), member4.getId());
-        chatRoom = chatRoomHttpTest.createChatRoom(memberIds);
+        moneySwaggingHttpTest = new MoneySwaggingHttpTest(webTestClient);
+        makeTestData();
     }
 
+    @DisplayName("[과제 1번] 뿌리기 API")
     @Test
     void createMoneySwagging() {
         //given
@@ -69,29 +53,49 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         String chatRoomId = chatRoom.getChatRoomId();
         Long userId = giver.getId();
 
-        CreateMoneySwaggingDto.Request requestBody = CreateMoneySwaggingDto.Request.builder()
-                .amount(amount)
-                .peopleCount(peopleCount)
-                .build();
-
         //when
-        CreateMoneySwaggingDto.Response responseBody = webTestClient
-                .post().uri(MoneySwaggingController.URL_CREATE_MONEY_SWAGGING)
-                .header(Header.CHAT_ROOM_ID.getKey(), chatRoomId)
-                .header(Header.USER_ID.getKey(), String.valueOf(userId))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .bodyValue(requestBody)
-                .exchange()
-                .expectStatus().isCreated()
-                .expectBody(CreateMoneySwaggingDto.Response.class)
-                .returnResult()
-                .getResponseBody();
+        CreateMoneySwaggingDto.Response responseBody = moneySwaggingHttpTest.create(amount, peopleCount, chatRoomId, userId);
 
         //then
         assert responseBody != null;
         assertThat(responseBody.getMoneySwaggingId()).isNotNull();
         assertThat(responseBody.getToken().length()).isEqualTo(3);
         assertThat(responseBody.getCreatedTime()).isBefore(LocalDateTime.now());
+    }
+
+    private void makeTestData() {
+        makeMembers();
+        makeAccounts();
+        depositBigMoneyToTest();
+        makeChatRoom();
+    }
+
+    private void makeMembers() {
+        member1 = memberHttpTest.createMember("member1");
+        member2 = memberHttpTest.createMember("member2");
+        member3 = memberHttpTest.createMember("member3");
+        member4 = memberHttpTest.createMember("member4");
+        giver = memberHttpTest.createMember("giver");
+    }
+
+    private void makeAccounts() {
+        account1 = accountHttpTest.createAccount(member1.getId());
+        account2 = accountHttpTest.createAccount(member2.getId());
+        account3 = accountHttpTest.createAccount(member3.getId());
+        account4 = accountHttpTest.createAccount(member4.getId());
+        giverAccount = accountHttpTest.createAccount(giver.getId());
+    }
+
+    private void depositBigMoneyToTest() {
+        accountHttpTest.deposit(account1.getAccountId(), member1.getId(), 1_000_000_000);
+        accountHttpTest.deposit(account2.getAccountId(), member2.getId(), 1_000_000_000);
+        accountHttpTest.deposit(account3.getAccountId(), member3.getId(), 1_000_000_000);
+        accountHttpTest.deposit(account4.getAccountId(), member4.getId(), 1_000_000_000);
+        accountHttpTest.deposit(giverAccount.getAccountId(), giver.getId(), 1_000_000_000);
+    }
+
+    private void makeChatRoom() {
+        memberIds = List.of(giver.getId(), member1.getId(), member2.getId(), member3.getId(), member4.getId());
+        chatRoom = chatRoomHttpTest.createChatRoom(memberIds);
     }
 }
