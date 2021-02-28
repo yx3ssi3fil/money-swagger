@@ -21,7 +21,6 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
     private MemberHttpTest memberHttpTest;
     private ChatRoomHttpTest chatRoomHttpTest;
 
-
     private static CreateMemberDto.Response member1;
     private static CreateMemberDto.Response member2;
     private static CreateMemberDto.Response member3;
