@@ -17,6 +17,7 @@ public class MoneyAcceptanceDto {
     @Getter
     @NoArgsConstructor
     public static class Response {
-
+        private Integer receiveAmount;
+        private Boolean doesSuccessToReceive;
     }
 }
