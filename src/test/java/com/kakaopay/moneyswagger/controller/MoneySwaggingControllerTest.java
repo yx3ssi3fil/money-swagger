@@ -74,7 +74,8 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
 
 
         //when
-        RetrieveMoneySwaggingDto.Response responseBody = webTestClient.get().uri(MoneySwaggingController.URL_RETRIEVE_MONEY_SWAGGING + "?token=" + token)
+        RetrieveMoneySwaggingDto.Response responseBody =
+                webTestClient.get().uri(MoneySwaggingController.URL_RETRIEVE_MONEY_SWAGGING + "?token=" + token)
                 .header(Header.CHAT_ROOM_ID.getKey(), chatRoomId)
                 .header(Header.USER_ID.getKey(), String.valueOf(userId))
                 .accept(MediaType.APPLICATION_JSON)
@@ -87,7 +88,7 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         //then
         assertThat(responseBody.getMoneySwaggingAmount()).isEqualTo(amount);
         assertThat(responseBody.getCompletedAmount()).isEqualTo(0);
-        assertThat(responseBody.getCompletedInfos()).isNull();
+        assertThat(responseBody.getCompletedInfos()).isNullOrEmpty();
         assertThat(responseBody.getMoneySwaggingTime()).isBefore(LocalDateTime.now());
     }
 

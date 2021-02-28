@@ -1,19 +1,21 @@
 package com.kakaopay.moneyswagger.controller;
 
 import com.kakaopay.moneyswagger.dto.CreateMoneySwaggingDto;
+import com.kakaopay.moneyswagger.dto.RetrieveMoneySwaggingDto;
 import com.kakaopay.moneyswagger.entity.Header;
+import com.kakaopay.moneyswagger.entity.account.MoneyPortion;
 import com.kakaopay.moneyswagger.entity.account.MoneySwagging;
 import com.kakaopay.moneyswagger.service.MoneySwaggingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -42,6 +44,21 @@ public class MoneySwaggingController {
         return ResponseEntity
                 .created(URI.create(URL_CREATE_MONEY_SWAGGING + "/" + savedMoneySwagging.getId()))
                 .body(responseBody);
+    }
+
+    @GetMapping(URL_RETRIEVE_MONEY_SWAGGING)
+    public ResponseEntity<RetrieveMoneySwaggingDto.Response> retrieveByToken(@RequestParam(name = "token") String token) {
+        Optional<MoneySwagging> optionalMoneySwagging = moneySwaggingService.retrieveByToken(token);
+        if (optionalMoneySwagging.isEmpty()) {
+            return ResponseEntity
+                    .badRequest()
+                    .build();
+        }
+
+        MoneySwagging moneySwagging = optionalMoneySwagging.get();
+        RetrieveMoneySwaggingDto.Response responseBody = RetrieveMoneySwaggingDto.Response.from(moneySwagging);
+        return ResponseEntity
+                .ok(responseBody);
     }
 
     private String getHeader(Header header, HttpServletRequest request) {

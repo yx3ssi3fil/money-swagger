@@ -46,4 +46,8 @@ public class MoneyPortion extends BaseTimeEntity {
         this.chatRoom = moneySwagging.getChatRoom();
         this.amount = amount;
     }
+
+    public Boolean isReceived() {
+        return receiver != null;
+    }
 }

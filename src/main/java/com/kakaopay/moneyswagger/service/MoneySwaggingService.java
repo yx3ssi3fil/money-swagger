@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -50,6 +51,14 @@ public class MoneySwaggingService {
         } catch (Exception e) {
             throw new IllegalArgumentException();
         }
+    }
+
+    public Optional<MoneySwagging> retrieveByToken(String token) {
+        Optional<MoneySwagging> moneySwagging = moneySwaggingRepository.findByToken(token);
+        if (moneySwagging.isEmpty()) {
+            return null;
+        }
+        return moneySwagging;
     }
 
     private MoneySwagging makeMoneySwagging(CreateMoneySwaggingDto.Request request, Member giver, ChatRoom chatRoom) {

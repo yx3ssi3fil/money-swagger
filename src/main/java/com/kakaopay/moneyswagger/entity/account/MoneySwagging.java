@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor
@@ -58,5 +59,11 @@ public class MoneySwagging extends BaseTimeEntity {
 
     public void assignMoneyPortions(List<MoneyPortion> moneyPortions) {
         this.moneyPortions =  moneyPortions;
+    }
+
+    public List<MoneyPortion> getCompletedMoneyPortions() {
+        return moneyPortions.stream()
+                .filter(MoneyPortion::isReceived)
+                .collect(Collectors.toList());
     }
 }
