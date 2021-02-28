@@ -35,13 +35,13 @@ public class MoneySwaggingHttpTest {
                 .getResponseBody();
     }
 
-    public RetrieveMoneySwaggingDto.Response retrieveByGiver(String chatRoomId, String token, Long userId, Long moneySwaggingId) {
+    public <T> RetrieveMoneySwaggingDto.Response retrieveByGiver(String chatRoomId, String token, Long userId, Long moneySwaggingId, HttpStatus T) {
         return webTestClient.get().uri(MoneySwaggingController.URL_RETRIEVE_MONEY_SWAGGING + "?token=" + token, moneySwaggingId)
                 .header(Header.CHAT_ROOM_ID.getKey(), chatRoomId)
                 .header(Header.USER_ID.getKey(), String.valueOf(userId))
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
-                .expectStatus().isOk()
+                .expectStatus().isEqualTo(T)
                 .expectBody(RetrieveMoneySwaggingDto.Response.class)
                 .returnResult()
                 .getResponseBody();

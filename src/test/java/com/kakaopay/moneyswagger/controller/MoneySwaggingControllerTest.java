@@ -178,7 +178,8 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         String token = moneySwagging.getToken();
 
         //when
-        RetrieveMoneySwaggingDto.Response responseBody = moneySwaggingHttpTest.retrieveByGiver(chatRoomId, token, userId, moneySwagging.getMoneySwaggingId());
+        RetrieveMoneySwaggingDto.Response responseBody
+                = moneySwaggingHttpTest.retrieveByGiver(chatRoomId, token, userId, moneySwagging.getMoneySwaggingId(), HttpStatus.OK);
 
         //then
         assertThat(responseBody.getMoneySwaggingAmount()).isEqualTo(amount);
@@ -200,12 +201,7 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         String token = moneySwagging.getToken();
 
         //when, then
-        webTestClient.get().uri(MoneySwaggingController.URL_RETRIEVE_MONEY_SWAGGING + "?token=" + token, moneySwagging.getMoneySwaggingId())
-                .header(Header.CHAT_ROOM_ID.getKey(), chatRoomId)
-                .header(Header.USER_ID.getKey(), String.valueOf(userId))
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isBadRequest();
+        moneySwaggingHttpTest.retrieveByGiver(chatRoomId, token, userId, moneySwagging.getMoneySwaggingId(), HttpStatus.BAD_REQUEST);
     }
 
     private void makeTestData() {
