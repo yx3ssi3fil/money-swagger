@@ -1,6 +1,7 @@
 package com.kakaopay.moneyswagger.controller;
 
 import com.kakaopay.moneyswagger.dto.CreateMoneySwaggingDto;
+import com.kakaopay.moneyswagger.dto.MoneyAcceptanceDto;
 import com.kakaopay.moneyswagger.dto.RetrieveMoneySwaggingDto;
 import com.kakaopay.moneyswagger.entity.Header;
 import com.kakaopay.moneyswagger.entity.account.MoneySwagging;
@@ -24,7 +25,7 @@ import java.util.Optional;
 public class MoneySwaggingController {
     public static final String URL_CREATE_MONEY_SWAGGING = "/money-swaggings";
     public static final String URL_RETRIEVE_MONEY_SWAGGING = "/moeny-swaggings/{id}";
-    public static final String URL_RECEIVE_MONEY = "/money-swaggings/acceptances";
+    public static final String URL_ACCEPT_MONEY = "/money-swaggings/acceptances";
 
 
     private final MoneySwaggingService moneySwaggingService;
@@ -68,6 +69,33 @@ public class MoneySwaggingController {
         RetrieveMoneySwaggingDto.Response responseBody = RetrieveMoneySwaggingDto.Response.from(moneySwagging);
         return ResponseEntity
                 .ok(responseBody);
+    }
+
+    @PostMapping(URL_ACCEPT_MONEY)
+    public ResponseEntity<MoneyAcceptanceDto.Response> acceptMoney(HttpServletRequest httpServletRequest,
+                                                                   @RequestBody MoneyAcceptanceDto.Request request) {
+        String userId = getHeader(Header.USER_ID, httpServletRequest);
+        String token = request.getToken();
+        Optional<MoneySwagging> optionalMoneySwagging = moneySwaggingService.retrieveByToken(token);
+
+        if (optionalMoneySwagging.isEmpty()) {
+            return ResponseEntity
+                    .badRequest()
+                    .build();
+        }
+
+        MoneySwagging moneySwagging = optionalMoneySwagging.get();
+        Long moneySwaggerId = moneySwagging.getMember().getId();
+
+        if (moneySwaggerId == Long.valueOf(userId)) {
+            return ResponseEntity
+                    .badRequest()
+                    .build();
+        }
+
+        return ResponseEntity
+                .ok()
+                .build();
     }
 
     private Boolean isAuthorizedToRetrieve(MoneySwagging moneySwagging, HttpServletRequest request) {

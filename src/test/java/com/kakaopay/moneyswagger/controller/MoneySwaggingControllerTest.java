@@ -74,7 +74,7 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         MoneyAcceptanceDto.Request requestBody = new MoneyAcceptanceDto.Request(token);
 
         //when
-        webTestClient.post().uri(MoneySwaggingController.URL_RECEIVE_MONEY)
+        webTestClient.post().uri(MoneySwaggingController.URL_ACCEPT_MONEY)
                 .header(Header.CHAT_ROOM_ID.getKey(), chatRoomId)
                 .header(Header.USER_ID.getKey(), String.valueOf(userId))
                 .contentType(MediaType.APPLICATION_JSON)
