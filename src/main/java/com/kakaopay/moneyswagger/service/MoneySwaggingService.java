@@ -45,6 +45,7 @@ public class MoneySwaggingService {
             Long giverId = Long.valueOf(memberId);
             Member giver = memberService.retrieveMemberById(giverId).get();
             ChatRoom chatRoom = chatRoomService.retrieveById(chatRoomId).get();
+
             return makeMoneySwagging(request, giver, chatRoom);
         } catch (Exception e) {
             throw new IllegalArgumentException();

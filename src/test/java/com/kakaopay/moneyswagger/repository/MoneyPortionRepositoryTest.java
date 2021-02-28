@@ -61,6 +61,5 @@ public class MoneyPortionRepositoryTest {
         assertThat(savedMoneyPortion.getChatRoom()).isEqualTo(savedChatRoom);
         assertThat(savedMoneyPortion.getMoneySwagging()).isEqualTo(savedMoneySwagging);
         assertThat(savedMoneyPortion.getReceiver()).isEqualTo(receiver);
-
     }
 }

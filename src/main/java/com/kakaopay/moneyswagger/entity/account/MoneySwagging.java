@@ -24,6 +24,8 @@ public class MoneySwagging extends BaseTimeEntity {
 
     private Integer amount;
 
+    private Integer completedAmount;
+
     private Integer peopleCount;
 
     @OneToMany
@@ -39,17 +41,17 @@ public class MoneySwagging extends BaseTimeEntity {
     private Member member; //given
 
     @Builder
-    public MoneySwagging(Long id, String token, Integer amount, Integer peopleCount,
+    public MoneySwagging(Long id, String token, Integer amount, Integer completedAmount, Integer peopleCount,
                          List<MoneyPortion> moneyPortions, ChatRoom chatRoom, Member member) {
         this.id = id;
         this.token = token;
         this.amount = amount;
+        this.completedAmount = completedAmount;
         this.peopleCount = peopleCount;
         this.moneyPortions = moneyPortions;
         this.chatRoom = chatRoom;
         this.member = member;
     }
-
     public void assignToken(String token) {
         this.token = token;
     }
