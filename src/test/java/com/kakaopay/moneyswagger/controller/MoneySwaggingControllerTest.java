@@ -99,7 +99,6 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
 
         //when
         moneySwaggingHttpTest.acceptMoney(chatRoomId, member4.getId(), requestBody, HttpStatus.BAD_REQUEST);
-
     }
 
     @DisplayName("[과제 2번] 받기 API - 받기 실패(이미 받아간 사람이 다시 받으려고 함)")
@@ -126,19 +125,11 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         Integer amount = 1_000_000;
         Integer peopleCount = 3;
         String chatRoomId = chatRoom.getChatRoomId();
-        Long userId = giver.getId();
         String token = moneySwaggingHttpTest.create(amount, peopleCount, chatRoomId, giver.getId()).getToken();
         MoneyAcceptanceDto.Request requestBody = new MoneyAcceptanceDto.Request(token);
 
         //when, then
-        webTestClient.post().uri(MoneySwaggingController.URL_ACCEPT_MONEY)
-                .header(Header.CHAT_ROOM_ID.getKey(), chatRoomId)
-                .header(Header.USER_ID.getKey(), String.valueOf(userId))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .bodyValue(requestBody)
-                .exchange()
-                .expectStatus().isBadRequest();
+        moneySwaggingHttpTest.acceptMoney(chatRoomId, giver.getId(), requestBody, HttpStatus.BAD_REQUEST);
     }
 
     @DisplayName("[과제 2번] 받기 API - 받기 실패(채팅방 참여자가 아닌 사람)")
@@ -150,19 +141,11 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         Integer peopleCount = 3;
         String chatRoomId = chatRoom.getChatRoomId();
         CreateMemberDto.Response other = memberHttpTest.createMember("other");
-        Long userId = other.getId();
         String token = moneySwaggingHttpTest.create(amount, peopleCount, chatRoomId, giver.getId()).getToken();
         MoneyAcceptanceDto.Request requestBody = new MoneyAcceptanceDto.Request(token);
 
         //when, then
-        webTestClient.post().uri(MoneySwaggingController.URL_ACCEPT_MONEY)
-                .header(Header.CHAT_ROOM_ID.getKey(), chatRoomId)
-                .header(Header.USER_ID.getKey(), String.valueOf(userId))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .bodyValue(requestBody)
-                .exchange()
-                .expectStatus().isBadRequest();
+        moneySwaggingHttpTest.acceptMoney(chatRoomId, other.getId(), requestBody, HttpStatus.BAD_REQUEST);
     }
 
     @DisplayName("[과제 3번] 조회 API - 조회 성공(뿌린 사람이 조회)")
