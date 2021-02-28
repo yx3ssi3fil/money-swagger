@@ -53,12 +53,13 @@ public class MoneySwagging extends BaseTimeEntity {
         this.chatRoom = chatRoom;
         this.member = member;
     }
+
     public void assignToken(String token) {
         this.token = token;
     }
 
     public void assignMoneyPortions(List<MoneyPortion> moneyPortions) {
-        this.moneyPortions =  moneyPortions;
+        this.moneyPortions = moneyPortions;
     }
 
     public List<MoneyPortion> getCompletedMoneyPortions() {

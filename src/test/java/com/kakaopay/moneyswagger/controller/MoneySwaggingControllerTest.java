@@ -87,7 +87,6 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
                 .getResponseBody();
 
         //then
-        assertThat(responseBody.getDoesSuccessToReceive()).isTrue();
         assertThat(responseBody.getReceiveAmount()).isGreaterThan(0);
     }
 

@@ -1,5 +1,6 @@
 package com.kakaopay.moneyswagger.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -18,6 +19,10 @@ public class MoneyAcceptanceDto {
     @NoArgsConstructor
     public static class Response {
         private Integer receiveAmount;
-        private Boolean doesSuccessToReceive;
+
+        @Builder
+        public Response(Integer receiveAmount) {
+            this.receiveAmount = receiveAmount;
+        }
     }
 }

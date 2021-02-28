@@ -1,6 +1,8 @@
 package com.kakaopay.moneyswagger.service;
 
 import com.kakaopay.moneyswagger.dto.CreateMoneySwaggingDto;
+import com.kakaopay.moneyswagger.entity.TransferRole;
+import com.kakaopay.moneyswagger.entity.account.Account;
 import com.kakaopay.moneyswagger.entity.account.MoneyPortion;
 import com.kakaopay.moneyswagger.entity.account.MoneySwagging;
 import com.kakaopay.moneyswagger.entity.chat.ChatRoom;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -28,6 +31,7 @@ public class MoneySwaggingService {
 
     private final MemberService memberService;
     private final ChatRoomService chatRoomService;
+    private final AccountService accountService;
 
     private final MoneySwaggingRepository moneySwaggingRepository;
     private final MoneyPortionRepository moneyPortionRepository;
@@ -62,6 +66,28 @@ public class MoneySwaggingService {
         return chatRoom.getMembers()
                 .stream()
                 .anyMatch(member -> userId == member.getId());
+    }
+
+    public synchronized MoneyPortion acceptMoney(MoneySwagging moneySwagging, List<MoneyPortion> moneyPortions, Long userId) {
+        MoneyPortion availableMoneyPortion = moneyPortions.get(0);
+
+        Member moneySwagger = moneySwagging.getMember();
+        Account giver = moneySwagger.getMajorAccount();
+        Member user = memberService.retrieveMemberById(userId).get();
+        Account receiver = user.getMajorAccount();
+
+        availableMoneyPortion.assignReceiver(user);
+        Integer amount = availableMoneyPortion.getAmount();
+
+        Map<TransferRole, Account> transfer = accountService.transfer(giver, receiver, amount);
+
+        return availableMoneyPortion;
+    }
+
+    public List<MoneyPortion> getAvailableMoneyPortions(MoneySwagging moneySwagging) {
+        return moneySwagging.getMoneyPortions().stream()
+                .filter(moneyPortion -> !moneyPortion.isReceived())
+                .collect(Collectors.toList());
     }
 
     private MoneySwagging makeMoneySwagging(CreateMoneySwaggingDto.Request request, Member giver, ChatRoom chatRoom) {

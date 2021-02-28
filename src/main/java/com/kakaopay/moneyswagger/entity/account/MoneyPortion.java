@@ -50,4 +50,8 @@ public class MoneyPortion extends BaseTimeEntity {
     public Boolean isReceived() {
         return receiver != null;
     }
+
+    public void assignReceiver(Member receiver) {
+        this.receiver = receiver;
+    }
 }

@@ -4,6 +4,9 @@ import com.kakaopay.moneyswagger.dto.CreateMoneySwaggingDto;
 import com.kakaopay.moneyswagger.dto.MoneyAcceptanceDto;
 import com.kakaopay.moneyswagger.dto.RetrieveMoneySwaggingDto;
 import com.kakaopay.moneyswagger.entity.Header;
+import com.kakaopay.moneyswagger.entity.TransferRole;
+import com.kakaopay.moneyswagger.entity.account.Account;
+import com.kakaopay.moneyswagger.entity.account.MoneyPortion;
 import com.kakaopay.moneyswagger.entity.account.MoneySwagging;
 import com.kakaopay.moneyswagger.entity.member.Member;
 import com.kakaopay.moneyswagger.service.MoneySwaggingService;
@@ -17,6 +20,8 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -101,9 +106,23 @@ public class MoneySwaggingController {
                     .build();
         }
 
+        if (isOverTenMinutes(moneySwagging)) {
+            return ResponseEntity
+                    .badRequest()
+                    .build();
+        }
+
+        List<MoneyPortion> moneyPortions = moneySwaggingService.getAvailableMoneyPortions(moneySwagging);
+        if (moneyPortions.isEmpty()) {
+            return ResponseEntity
+                    .badRequest()
+                    .build();
+        }
+
+        MoneyPortion moneyPortion = moneySwaggingService.acceptMoney(moneySwagging, moneyPortions, userId);
+        MoneyAcceptanceDto.Response responseBody = new MoneyAcceptanceDto.Response(moneyPortion.getAmount());
         return ResponseEntity
-                .ok()
-                .build();
+                .ok(responseBody);
     }
 
     private Boolean isAuthorizedToRetrieve(MoneySwagging moneySwagging, HttpServletRequest request) {
@@ -118,6 +137,14 @@ public class MoneySwaggingController {
         } catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    private Boolean isOverTenMinutes(MoneySwagging moneySwagging) {
+        LocalDateTime nowInKst = LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toLocalDateTime();
+        LocalDateTime createdTimeInKst = moneySwagging.getCreatedDate().atZone(ZoneId.of("Asia/Seoul")).toLocalDateTime();
+        LocalDateTime sevenDaysAgo = nowInKst.minusMinutes(10);
+
+        return createdTimeInKst.isBefore(sevenDaysAgo);
     }
 
     private Boolean isOverSevenDaysAgo(MoneySwagging moneySwagging) {

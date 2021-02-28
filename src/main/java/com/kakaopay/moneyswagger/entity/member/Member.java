@@ -42,4 +42,8 @@ public class Member extends BaseTimeEntity {
     public void joinChatRoom(ChatRoom chatRoom) {
         this.chatroom = chatRoom;
     }
+
+    public Account getMajorAccount() {
+        return this.accounts.get(0);
+    }
 }
