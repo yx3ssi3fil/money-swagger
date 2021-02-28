@@ -54,11 +54,7 @@ public class MoneySwaggingService {
     }
 
     public Optional<MoneySwagging> retrieveByToken(String token) {
-        Optional<MoneySwagging> moneySwagging = moneySwaggingRepository.findByToken(token);
-        if (moneySwagging.isEmpty()) {
-            return null;
-        }
-        return moneySwagging;
+        return moneySwaggingRepository.findByToken(token);
     }
 
     private MoneySwagging makeMoneySwagging(CreateMoneySwaggingDto.Request request, Member giver, ChatRoom chatRoom) {

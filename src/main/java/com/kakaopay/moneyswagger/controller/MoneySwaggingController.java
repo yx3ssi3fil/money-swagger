@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Optional;
 
 @Slf4j
@@ -56,18 +57,7 @@ public class MoneySwaggingController {
         }
 
         MoneySwagging moneySwagging = optionalMoneySwagging.get();
-        String userId = getHeader(Header.USER_ID, request);
-        Member moneySwagger = moneySwagging.getMember();
-        if (Long.valueOf(userId) != moneySwagger.getId()) {
-            return ResponseEntity
-                    .badRequest()
-                    .build();
-        }
-
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime createdDate = moneySwagger.getCreatedDate();
-        LocalDateTime sevenDaysAgo = now.minusDays(7);
-        if (createdDate.isBefore(sevenDaysAgo)) {
+        if (isAuthorizedToRetrieve(moneySwagging, request)) {
             return ResponseEntity
                     .badRequest()
                     .build();
@@ -76,6 +66,28 @@ public class MoneySwaggingController {
         RetrieveMoneySwaggingDto.Response responseBody = RetrieveMoneySwaggingDto.Response.from(moneySwagging);
         return ResponseEntity
                 .ok(responseBody);
+    }
+
+    private Boolean isAuthorizedToRetrieve(MoneySwagging moneySwagging, HttpServletRequest request) {
+        return isGiver(moneySwagging, request) || isOverSevenDaysAgo(moneySwagging);
+    }
+
+    private Boolean isGiver(MoneySwagging moneySwagging, HttpServletRequest request) {
+        try {
+            String userId = getHeader(Header.USER_ID, request);
+            Member moneySwagger = moneySwagging.getMember();
+            return Long.valueOf(userId) != moneySwagger.getId();
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private Boolean isOverSevenDaysAgo(MoneySwagging moneySwagging) {
+        LocalDateTime nowInKst = LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toLocalDateTime();
+        LocalDateTime createdTimeInKst = moneySwagging.getCreatedDate().atZone(ZoneId.of("Asia/Seoul")).toLocalDateTime();
+        LocalDateTime sevenDaysAgo = nowInKst.minusDays(7);
+
+        return createdTimeInKst.isBefore(sevenDaysAgo);
     }
 
     private String getHeader(Header header, HttpServletRequest request) {
