@@ -76,20 +76,39 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         //when
         RetrieveMoneySwaggingDto.Response responseBody =
                 webTestClient.get().uri(MoneySwaggingController.URL_RETRIEVE_MONEY_SWAGGING + "?token=" + token)
-                .header(Header.CHAT_ROOM_ID.getKey(), chatRoomId)
-                .header(Header.USER_ID.getKey(), String.valueOf(userId))
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(RetrieveMoneySwaggingDto.Response.class)
-                .returnResult()
-                .getResponseBody();
+                        .header(Header.CHAT_ROOM_ID.getKey(), chatRoomId)
+                        .header(Header.USER_ID.getKey(), String.valueOf(userId))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .exchange()
+                        .expectStatus().isOk()
+                        .expectBody(RetrieveMoneySwaggingDto.Response.class)
+                        .returnResult()
+                        .getResponseBody();
 
         //then
         assertThat(responseBody.getMoneySwaggingAmount()).isEqualTo(amount);
         assertThat(responseBody.getCompletedAmount()).isEqualTo(0);
         assertThat(responseBody.getCompletedInfos()).isNullOrEmpty();
         assertThat(responseBody.getMoneySwaggingTime()).isBefore(LocalDateTime.now());
+    }
+
+    @DisplayName("[과제 2번] 조회 API - 뿌리지 않은 사람이 조회")
+    @Test
+    void retrieveMoneySwaggingByReceiver() {
+        // given
+        Integer amount = 1_000_000;
+        Integer peopleCount = 3;
+        String chatRoomId = chatRoom.getChatRoomId();
+        Long userId = member1.getId();
+        String token = moneySwaggingHttpTest.create(amount, peopleCount, chatRoomId, userId).getToken();
+
+        //when, then
+        webTestClient.get().uri(MoneySwaggingController.URL_RETRIEVE_MONEY_SWAGGING + "?token=" + token)
+                .header(Header.CHAT_ROOM_ID.getKey(), chatRoomId)
+                .header(Header.USER_ID.getKey(), String.valueOf(userId))
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus().isBadRequest();
     }
 
     private void makeTestData() {
