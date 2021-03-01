@@ -21,8 +21,7 @@ public class RetrieveMoneySwaggingDto {
         private List<CompletedInfo> completedInfos = Collections.EMPTY_LIST;
 
         @Builder
-        public Response(LocalDateTime moneySwaggingTime, Integer moneySwaggingAmount,
-                        Integer completedAmount, List<CompletedInfo> completedInfos) {
+        public Response(LocalDateTime moneySwaggingTime, Integer moneySwaggingAmount, Integer completedAmount, List<CompletedInfo> completedInfos) {
             this.moneySwaggingTime = moneySwaggingTime;
             this.moneySwaggingAmount = moneySwaggingAmount;
             this.completedAmount = completedAmount;

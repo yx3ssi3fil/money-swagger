@@ -1,0 +1,41 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+:operation-http-request-title: Example Request
+:operation-http-response-title: Example Response
+
+[[resources]]
+= 머니뿌리기 API 문서
+
+=== [과제1] 머니 뿌리기 API
+
+operation::money-swagging/create[snippets='http-request']
+operation::money-swagging/create[snippets='request-headers']
+operation::money-swagging/create[snippets='request-fields']
+
+operation::money-swagging/create[snippets='http-response']
+operation::money-swagging/create[snippets='response-fields']
+
+
+=== [과제2] 머니 받기 API
+
+operation::money-swagging/accept-money[snippets='http-request']
+operation::money-swagging/accept-money[snippets='request-headers']
+operation::money-swagging/accept-money[snippets='request-fields']
+
+operation::money-swagging/accept-money[snippets='http-response']
+operation::money-swagging/accept-money[snippets='response-fields']
+
+=== [과제3] 뿌리기 조회 API
+
+operation::money-swagging/retrieve[snippets='http-request']
+operation::money-swagging/retrieve[snippets='request-headers']
+
+operation::money-swagging/retrieve[snippets='http-response']
+operation::money-swagging/retrieve[snippets='response-fields']

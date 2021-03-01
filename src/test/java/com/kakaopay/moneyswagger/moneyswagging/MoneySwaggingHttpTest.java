@@ -48,7 +48,7 @@ public class MoneySwaggingHttpTest {
     }
 
     public <T> MoneyAcceptanceDto.Response acceptMoney(String chatRoomId, Long userId, MoneyAcceptanceDto.Request requestBody, HttpStatus T) {
-        return webTestClient.post().uri(MoneySwaggingController.URL_ACCEPT_MONEY)
+        return webTestClient.put().uri(MoneySwaggingController.URL_ACCEPT_MONEY)
                 .header(Header.CHAT_ROOM_ID.getKey(), chatRoomId)
                 .header(Header.USER_ID.getKey(), String.valueOf(userId))
                 .contentType(MediaType.APPLICATION_JSON)

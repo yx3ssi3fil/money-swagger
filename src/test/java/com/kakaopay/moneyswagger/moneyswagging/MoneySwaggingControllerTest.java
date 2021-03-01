@@ -19,7 +19,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class MoneySwaggingControllerTest extends AbstractControllerTest {
     private AccountHttpTest accountHttpTest;

@@ -2,7 +2,6 @@ package com.kakaopay.moneyswagger.member;
 
 import com.kakaopay.moneyswagger.member.dto.CreateMemberDto;
 import com.kakaopay.moneyswagger.member.dto.RetrieveMemberDto;
-import com.kakaopay.moneyswagger.member.MemberController;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -14,7 +13,7 @@ public class MemberHttpTest {
     }
 
     public CreateMemberDto.Response createMember(String name) {
-        CreateMemberDto.Request requestBody = new CreateMemberDto.Request("name");
+        CreateMemberDto.Request requestBody = new CreateMemberDto.Request(name);
 
         return webTestClient
                 .post().uri(MemberController.URL_CREATE_MEMBER)

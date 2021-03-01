@@ -73,7 +73,7 @@ public class MoneySwaggingController {
                 .ok(responseBody);
     }
 
-    @PostMapping(URL_ACCEPT_MONEY)
+    @PutMapping(URL_ACCEPT_MONEY)
     public ResponseEntity<MoneyAcceptanceDto.Response> acceptMoney(HttpServletRequest httpServletRequest,
                                                                    @RequestBody MoneyAcceptanceDto.Request request) {
         Optional<MoneySwagging> optionalMoneySwagging = moneySwaggingService.retrieveByChatRoomAndToken(request.getChatRoomId(), request.getToken());
