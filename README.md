@@ -12,16 +12,18 @@
 <br>
 
 ## 🎈어플리케이션 빌드 및 실행 방법
-1) 프로젝트 디렉토리로 이동
-2) 터미널에 아래 명령어 실행
+1) h2 DB 실행
+2) 프로젝트 디렉토리로 이동
+3) 터미널에 아래 명령어 실행
 ```
 ./gradlew build && java -jar ./build/libs/moneyswagger-0.0.1-SNAPSHOT.jar
 ```
 <br>
 
 ## 🎈API 문서  (Spring Rest Docs 이용한 API 문서 자동화) 
-1. 어플리케이션 실행 ('어플리케이션 빌드 및 실행 방법' 참고) 
-2. 웹 브라우저 실행 후 아래 URL 접속
+1. h2 DB 실행
+2. 어플리케이션 실행 ('어플리케이션 빌드 및 실행 방법' 참고) 
+3. 웹 브라우저 실행 후 아래 URL 접속 또는 [링크](http://localhost:8080/docs/api-guide.html) 클릭 
 ```
 http://localhost:8080/docs/api-guide.html
 ```
