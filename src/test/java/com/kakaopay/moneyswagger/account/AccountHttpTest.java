@@ -1,11 +1,11 @@
 package com.kakaopay.moneyswagger.account;
 
-import com.kakaopay.moneyswagger.account.AccountController;
 import com.kakaopay.moneyswagger.account.dto.CreateAccountDto;
 import com.kakaopay.moneyswagger.account.dto.DepositDto;
 import com.kakaopay.moneyswagger.account.dto.RetrieveAccountDto;
 import com.kakaopay.moneyswagger.account.dto.TransferDto;
 import com.kakaopay.moneyswagger.member.dto.CreateMemberDto;
+import com.kakaopay.moneyswagger.moneyswagging.model.Header;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -70,6 +70,7 @@ public class AccountHttpTest {
                 .build();
 
         return webTestClient.put().uri(AccountController.URL_TRANSFER, giverAccount.getAccountId())
+                .header(Header.USER_ID.getKey(), String.valueOf(giver.getId()))
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(requestBody)

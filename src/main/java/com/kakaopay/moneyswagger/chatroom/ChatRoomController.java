@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
 public class ChatRoomController {
     public static final String URL_CREATE_CHAT_ROOM = "/chat-rooms";
 
+    private static final String SLASH = "/";
+
     private final ChatRoomService chatRoomService;
 
     @PostMapping(URL_CREATE_CHAT_ROOM)
@@ -41,7 +43,7 @@ public class ChatRoomController {
                 .build();
 
         return ResponseEntity
-                .created(URI.create(URL_CREATE_CHAT_ROOM + "/" + chatRoom.getId()))
+                .created(URI.create(URL_CREATE_CHAT_ROOM + SLASH + chatRoom.getId()))
                 .body(responseBody);
     }
 }

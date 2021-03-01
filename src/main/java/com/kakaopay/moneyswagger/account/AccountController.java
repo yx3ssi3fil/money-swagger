@@ -6,8 +6,8 @@ import com.kakaopay.moneyswagger.account.dto.RetrieveAccountDto;
 import com.kakaopay.moneyswagger.account.dto.TransferDto;
 import com.kakaopay.moneyswagger.account.model.Account;
 import com.kakaopay.moneyswagger.account.model.TransferRole;
-import com.kakaopay.moneyswagger.member.model.Member;
 import com.kakaopay.moneyswagger.member.MemberService;
+import com.kakaopay.moneyswagger.member.model.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +27,8 @@ public class AccountController {
     public static final String URL_DEPOSIT = "/accounts/{accountId}/deposit";
     public static final String URL_TRANSFER = "/accounts/{accountId}/transfer";
 
+    private static final String SLASH = "/";
+
     private final AccountService accountService;
     private final MemberService memberService;
 
@@ -43,7 +45,7 @@ public class AccountController {
         Account savedAccount = accountService.createAccount(member);
         CreateAccountDto.Response responseBody = CreateAccountDto.Response.from(savedAccount);
         return ResponseEntity
-                .created(URI.create(URL_CREATE_ACCOUNT + "/" + savedAccount.getId()))
+                .created(URI.create(URL_CREATE_ACCOUNT + SLASH + savedAccount.getId()))
                 .body(responseBody);
     }
 
@@ -73,7 +75,7 @@ public class AccountController {
         }
 
         Account account = optionalAccount.get();
-        if (!account.getMember().getId().equals(request.getMemberId())) {
+        if (!account.isOwner(request.getMemberId())) {
             return ResponseEntity
                     .badRequest()
                     .build();
@@ -86,8 +88,9 @@ public class AccountController {
     }
 
     @PutMapping(URL_TRANSFER)
-    public ResponseEntity<TransferDto.Response> transfer(@PathVariable Long accountId, @RequestBody @Valid TransferDto.Request request) {
-        Optional<Account> optionalGiverAccount = accountService.retrieveById(accountId);
+    public ResponseEntity<TransferDto.Response> transfer(@PathVariable Long accountId,
+                                                         @RequestBody @Valid TransferDto.Request request) {
+        Optional<Account> optionalGiverAccount = accountService.getGiverAccount(accountId, request.getGiverMemberId());
         if (optionalGiverAccount.isEmpty()) {
             return ResponseEntity
                     .badRequest()
@@ -95,36 +98,15 @@ public class AccountController {
         }
 
         Account giverAccount = optionalGiverAccount.get();
-        if (!giverAccount.getMember().getId().equals(request.getGiverMemberId())) {
+        Optional<Account> receiverAccount = accountService.getReceiverAccount(request.getReceiverAccountId());
+        if (receiverAccount.isEmpty()) {
             return ResponseEntity
                     .badRequest()
                     .build();
         }
 
-        Optional<Account> optionalReceiverAccount = accountService.retrieveById(request.getReceiverAccountId());
-        if (optionalReceiverAccount.isEmpty()) {
-            return ResponseEntity
-                    .badRequest()
-                    .build();
-        }
-
-        Account receiverAccount = optionalReceiverAccount.get();
-        if (!receiverAccount.getMember().getName().equals(request.getReceiverName())) {
-            return ResponseEntity
-                    .badRequest()
-                    .build();
-        }
-
-        if (giverAccount.getBalance().intValue() < request.getTransferAmount()) {
-            return ResponseEntity
-                    .badRequest()
-                    .build();
-        }
-
-        Map<TransferRole, Account> accountsAfterTransfer = accountService.transfer(giverAccount, receiverAccount, request.getTransferAmount());
-        Account giverAfterTransfer = accountsAfterTransfer.get(TransferRole.GIVER);
-        Account receiverAfterTransfer = accountsAfterTransfer.get(TransferRole.RECEIVER);
-        TransferDto.Response responseBody = TransferDto.Response.from(giverAfterTransfer, receiverAfterTransfer);
+        Map<TransferRole, Account> accountsAfterTransfer = accountService.transfer(giverAccount, receiverAccount.get(), request.getTransferAmount());
+        TransferDto.Response responseBody = TransferDto.Response.from(accountsAfterTransfer);
         return ResponseEntity
                 .ok()
                 .body(responseBody);

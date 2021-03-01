@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
@@ -34,5 +36,28 @@ class AccountRepositoryTest {
         Member memberFromAccount = savedAccount.getMember();
         assertThat(memberFromAccount.getId()).isEqualTo(savedMember.getId());
         assertThat(memberFromAccount.getName()).isEqualTo(savedMember.getName());
+    }
+
+    @Test
+    void findByNameAndId() {
+        //given
+        Member member = Member.builder()
+                .name("Elon")
+                .build();
+        Member savedMember = memberRepository.save(member);
+        Account savedAccount = accountRepository.save(makeTestAccount(savedMember));
+
+        //when
+        Optional<Account> account = accountRepository.findByIdAndMember(savedAccount.getId(), savedMember);
+
+        //then
+        assertThat(account).isPresent();
+        Member accountOwner = account.get().getMember();
+        assertThat(accountOwner.getId()).isEqualTo(savedMember.getId());
+        assertThat(accountOwner.getName()).isEqualTo(savedMember.getName());
+    }
+
+    private Account makeTestAccount(Member member) {
+        return Account.builder().member(member).build();
     }
 }

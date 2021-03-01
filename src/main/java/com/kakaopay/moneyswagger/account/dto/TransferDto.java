@@ -1,12 +1,14 @@
 package com.kakaopay.moneyswagger.account.dto;
 
 import com.kakaopay.moneyswagger.account.model.Account;
+import com.kakaopay.moneyswagger.account.model.TransferRole;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.util.Map;
 
 public class TransferDto {
     @Getter
@@ -59,7 +61,10 @@ public class TransferDto {
             this.transferAmount = transferAmount;
         }
 
-        public static Response from(Account giverAfterTransfer, Account receiverAfterTransfer) {
+        public static Response from(Map<TransferRole, Account> accountsAfterTransfer) {
+            Account giverAfterTransfer = accountsAfterTransfer.get(TransferRole.GIVER);
+            Account receiverAfterTransfer = accountsAfterTransfer.get(TransferRole.RECEIVER);
+
             return Response.builder()
                     .giverAccountId(giverAfterTransfer.getId())
                     .giverBalance(giverAfterTransfer.getBalance().intValue())

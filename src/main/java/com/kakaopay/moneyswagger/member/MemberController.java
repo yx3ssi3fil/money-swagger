@@ -18,6 +18,8 @@ public class MemberController {
     public static final String URL_CREATE_MEMBER = "/members";
     public static final String URL_RETRIEVE_MEMBER = "/members/{id}";
 
+    private static final String SLASH = "/";
+
     private final MemberService memberService;
 
     @PostMapping(URL_CREATE_MEMBER)
@@ -26,7 +28,7 @@ public class MemberController {
         CreateMemberDto.Response responseBody = CreateMemberDto.Response.from(savedMember);
 
         return ResponseEntity
-                .created(URI.create(URL_CREATE_MEMBER + "/" + responseBody.getId()))
+                .created(URI.create(URL_CREATE_MEMBER + SLASH + responseBody.getId()))
                 .body(responseBody);
     }
 

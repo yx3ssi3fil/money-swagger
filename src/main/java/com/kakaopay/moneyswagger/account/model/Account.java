@@ -34,8 +34,15 @@ public class Account {
         this.balance = this.balance.add(BigDecimal.valueOf(depositAmount));
     }
 
-
     public void withdraw(Integer withdrawAmount) {
         this.balance = this.balance.subtract(BigDecimal.valueOf(withdrawAmount));
+    }
+
+    public Boolean isOwner(Long memberId) {
+        return this.member.getId().equals(memberId);
+    }
+
+    public Boolean isOwnerName(String name) {
+        return this.member.getName().equals(name);
     }
 }

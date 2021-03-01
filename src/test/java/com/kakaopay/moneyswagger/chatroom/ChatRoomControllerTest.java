@@ -25,7 +25,7 @@ public class ChatRoomControllerTest extends AbstractControllerTest {
         chatRoomHttpTest = new ChatRoomHttpTest(webTestClient);
     }
 
-    @DisplayName("채팅방 생성 (핵심로직에 집중하기 위해, 채팅방 생성될 때 모든 인원이 같이 들어오는 것으로 가정)")
+    @DisplayName("채팅방 생성 (채팅방 생성될 때 모든 인원이 같이 들어오는 것으로 가정)")
     @Test
     void createChatRoom() {
         //given

@@ -25,6 +25,8 @@ public class MoneySwaggingController {
     public static final String URL_RETRIEVE_MONEY_SWAGGING = "/moeny-swaggings";
     public static final String URL_ACCEPT_MONEY = "/money-swaggings/acceptances";
 
+    private static final String SLASH = "/";
+
     private final MoneySwaggingService moneySwaggingService;
 
     @PostMapping(URL_CREATE_MONEY_SWAGGING)
@@ -43,7 +45,7 @@ public class MoneySwaggingController {
         CreateMoneySwaggingDto.Response responseBody = CreateMoneySwaggingDto.Response.from(savedMoneySwagging);
 
         return ResponseEntity
-                .created(URI.create(URL_CREATE_MONEY_SWAGGING + "/" + savedMoneySwagging.getId()))
+                .created(URI.create(URL_CREATE_MONEY_SWAGGING + SLASH + savedMoneySwagging.getId()))
                 .body(responseBody);
     }
 
