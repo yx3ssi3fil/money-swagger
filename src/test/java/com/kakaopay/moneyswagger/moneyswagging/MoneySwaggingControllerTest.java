@@ -6,8 +6,10 @@ import com.kakaopay.moneyswagger.account.dto.CreateAccountDto;
 import com.kakaopay.moneyswagger.chatroom.ChatRoomHttpTest;
 import com.kakaopay.moneyswagger.chatroom.dto.CreateChatRoomDto;
 import com.kakaopay.moneyswagger.member.MemberHttpTest;
-import com.kakaopay.moneyswagger.moneyswagging.dto.*;
 import com.kakaopay.moneyswagger.member.dto.CreateMemberDto;
+import com.kakaopay.moneyswagger.moneyswagging.dto.CreateMoneySwaggingDto;
+import com.kakaopay.moneyswagger.moneyswagging.dto.MoneyAcceptanceDto;
+import com.kakaopay.moneyswagger.moneyswagging.dto.RetrieveMoneySwaggingDto;
 import org.junit.jupiter.api.*;
 import org.springframework.http.HttpStatus;
 
@@ -78,7 +80,7 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         String chatRoomId = chatRoom.getChatRoomId();
         Long userId = member1.getId();
         String token = moneySwaggingHttpTest.create(amount, peopleCount, chatRoomId, giver.getId()).getToken();
-        MoneyAcceptanceDto.Request requestBody = new MoneyAcceptanceDto.Request(token);
+        MoneyAcceptanceDto.Request requestBody = new MoneyAcceptanceDto.Request(token, chatRoomId);
 
         //when
         MoneyAcceptanceDto.Response responseBody = moneySwaggingHttpTest.acceptMoney(chatRoomId, userId, requestBody, HttpStatus.OK);
@@ -96,7 +98,7 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         Integer peopleCount = 3;
         String chatRoomId = chatRoom.getChatRoomId();
         String token = moneySwaggingHttpTest.create(amount, peopleCount, chatRoomId, giver.getId()).getToken();
-        MoneyAcceptanceDto.Request requestBody = new MoneyAcceptanceDto.Request(token);
+        MoneyAcceptanceDto.Request requestBody = new MoneyAcceptanceDto.Request(token, chatRoomId);
         moneySwaggingHttpTest.acceptMoney(chatRoomId, member1.getId(), requestBody, HttpStatus.OK);
         moneySwaggingHttpTest.acceptMoney(chatRoomId, member2.getId(), requestBody, HttpStatus.OK);
         moneySwaggingHttpTest.acceptMoney(chatRoomId, member3.getId(), requestBody, HttpStatus.OK);
@@ -114,7 +116,7 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         Integer peopleCount = 3;
         String chatRoomId = chatRoom.getChatRoomId();
         String token = moneySwaggingHttpTest.create(amount, peopleCount, chatRoomId, giver.getId()).getToken();
-        MoneyAcceptanceDto.Request requestBody = new MoneyAcceptanceDto.Request(token);
+        MoneyAcceptanceDto.Request requestBody = new MoneyAcceptanceDto.Request(token, chatRoomId);
         moneySwaggingHttpTest.acceptMoney(chatRoomId, member1.getId(), requestBody, HttpStatus.OK);
 
         //when, then
@@ -130,7 +132,7 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         Integer peopleCount = 3;
         String chatRoomId = chatRoom.getChatRoomId();
         String token = moneySwaggingHttpTest.create(amount, peopleCount, chatRoomId, giver.getId()).getToken();
-        MoneyAcceptanceDto.Request requestBody = new MoneyAcceptanceDto.Request(token);
+        MoneyAcceptanceDto.Request requestBody = new MoneyAcceptanceDto.Request(token, chatRoomId);
 
         //when, then
         moneySwaggingHttpTest.acceptMoney(chatRoomId, giver.getId(), requestBody, HttpStatus.BAD_REQUEST);
@@ -146,7 +148,7 @@ public class MoneySwaggingControllerTest extends AbstractControllerTest {
         String chatRoomId = chatRoom.getChatRoomId();
         CreateMemberDto.Response other = memberHttpTest.createMember("other");
         String token = moneySwaggingHttpTest.create(amount, peopleCount, chatRoomId, giver.getId()).getToken();
-        MoneyAcceptanceDto.Request requestBody = new MoneyAcceptanceDto.Request(token);
+        MoneyAcceptanceDto.Request requestBody = new MoneyAcceptanceDto.Request(token, chatRoomId);
 
         //when, then
         moneySwaggingHttpTest.acceptMoney(chatRoomId, other.getId(), requestBody, HttpStatus.BAD_REQUEST);

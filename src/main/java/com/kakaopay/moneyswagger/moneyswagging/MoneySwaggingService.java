@@ -1,16 +1,15 @@
 package com.kakaopay.moneyswagger.moneyswagging;
 
 import com.kakaopay.moneyswagger.account.AccountService;
-import com.kakaopay.moneyswagger.chatroom.ChatRoomService;
-import com.kakaopay.moneyswagger.moneyswagging.dto.CreateMoneySwaggingDto;
-import com.kakaopay.moneyswagger.account.model.TransferRole;
 import com.kakaopay.moneyswagger.account.model.Account;
-import com.kakaopay.moneyswagger.moneyswagging.model.MoneyPortion;
-import com.kakaopay.moneyswagger.moneyswagging.model.MoneySwagging;
+import com.kakaopay.moneyswagger.chatroom.ChatRoomService;
 import com.kakaopay.moneyswagger.chatroom.model.ChatRoom;
-import com.kakaopay.moneyswagger.member.model.Member;
 import com.kakaopay.moneyswagger.member.MemberService;
+import com.kakaopay.moneyswagger.member.model.Member;
+import com.kakaopay.moneyswagger.moneyswagging.dto.CreateMoneySwaggingDto;
+import com.kakaopay.moneyswagger.moneyswagging.model.MoneyPortion;
 import com.kakaopay.moneyswagger.moneyswagging.model.MoneyPortionRepository;
+import com.kakaopay.moneyswagger.moneyswagging.model.MoneySwagging;
 import com.kakaopay.moneyswagger.moneyswagging.model.MoneySwaggingRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,9 +17,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -31,6 +28,7 @@ import java.util.stream.IntStream;
 @Service
 public class MoneySwaggingService {
     private static final Integer ONE = 1;
+    private static final Integer ZERO_INDEX = 0;
     private static final Integer THREE_DIGITS = 3;
 
     private final MemberService memberService;
@@ -61,50 +59,45 @@ public class MoneySwaggingService {
         }
     }
 
-    public Optional<MoneySwagging> retrieveByToken(String token) {
-        return moneySwaggingRepository.findByToken(token);
+    @Transactional(readOnly = true)
+    public Optional<MoneySwagging> retrieveByGiverAndToken(String memberId, String token) {
+        try {
+            Long giverId = Long.valueOf(memberId);
+            Member giver = memberService.retrieveMemberById(giverId).get();
+
+            return moneySwaggingRepository.findByMemberAndToken(giver, token);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
     }
 
-    public Boolean isChatRoomMember(Long userId, MoneySwagging moneySwagging) {
-        ChatRoom chatRoom = moneySwagging.getChatRoom();
-        return chatRoom.getMembers()
-                .stream()
-                .anyMatch(member -> userId == member.getId());
+    @Transactional(readOnly = true)
+    public Optional<MoneySwagging> retrieveByChatRoomAndToken(String chatRoomId, String token) {
+        try {
+            ChatRoom chatRoom = chatRoomService.retrieveById(chatRoomId).get();
+
+            return moneySwaggingRepository.findByChatRoomAndToken(chatRoom, token);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
     }
 
     public synchronized MoneyPortion acceptMoney(MoneySwagging moneySwagging, List<MoneyPortion> moneyPortions, Long userId) {
-        MoneyPortion availableMoneyPortion = moneyPortions.get(0);
-
-        Member moneySwagger = moneySwagging.getMember();
-        Account giver = moneySwagger.getMajorAccount();
-        Member user = memberService.retrieveMemberById(userId).get();
-        Account receiver = user.getMajorAccount();
-
-        availableMoneyPortion.assignReceiver(user);
+        MoneyPortion availableMoneyPortion = pickOneRandomly(moneyPortions);
         Integer amount = availableMoneyPortion.getAmount();
 
-        Map<TransferRole, Account> transfer = accountService.transfer(giver, receiver, amount);
+        Member receiver = memberService.retrieveMemberById(userId).get();
+        Account receiverAccount = receiver.getMajorAccount();
+        availableMoneyPortion.assignReceiver(receiver);
+
+        Account giverAccount = moneySwagging.getGiverAccount();
+        accountService.transfer(giverAccount, receiverAccount, amount);
 
         return availableMoneyPortion;
     }
 
-    public List<MoneyPortion> getAvailableMoneyPortions(MoneySwagging moneySwagging, Long userId) {
-        List<MoneyPortion> moneyPortions = moneySwagging.getMoneyPortions();
-
-        if (isAgainAcceptance(moneyPortions, userId)) {
-            return Collections.emptyList();
-        }
-
-        return moneyPortions.stream()
-                .filter(moneyPortion -> !moneyPortion.isReceived())
-                .collect(Collectors.toList());
-    }
-
-    private Boolean isAgainAcceptance(List<MoneyPortion> moneyPortions, Long userId) {
-        return moneyPortions.stream()
-                .filter(MoneyPortion::isReceived)
-                .anyMatch(moneyPortion -> moneyPortion.getReceiver().getId().equals(userId));
-
+    private MoneyPortion pickOneRandomly(List<MoneyPortion> moneyPortions) {
+        return moneyPortions.get(ZERO_INDEX);
     }
 
     private MoneySwagging makeMoneySwagging(CreateMoneySwaggingDto.Request request, Member giver, ChatRoom chatRoom) {

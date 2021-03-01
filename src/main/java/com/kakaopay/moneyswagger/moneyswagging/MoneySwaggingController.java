@@ -6,7 +6,6 @@ import com.kakaopay.moneyswagger.moneyswagging.dto.RetrieveMoneySwaggingDto;
 import com.kakaopay.moneyswagger.moneyswagging.model.Header;
 import com.kakaopay.moneyswagger.moneyswagging.model.MoneyPortion;
 import com.kakaopay.moneyswagger.moneyswagging.model.MoneySwagging;
-import com.kakaopay.moneyswagger.member.model.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,9 +22,8 @@ import java.util.Optional;
 @RestController
 public class MoneySwaggingController {
     public static final String URL_CREATE_MONEY_SWAGGING = "/money-swaggings";
-    public static final String URL_RETRIEVE_MONEY_SWAGGING = "/moeny-swaggings/{id}";
+    public static final String URL_RETRIEVE_MONEY_SWAGGING = "/moeny-swaggings";
     public static final String URL_ACCEPT_MONEY = "/money-swaggings/acceptances";
-
 
     private final MoneySwaggingService moneySwaggingService;
 
@@ -52,8 +48,11 @@ public class MoneySwaggingController {
     }
 
     @GetMapping(URL_RETRIEVE_MONEY_SWAGGING)
-    public ResponseEntity<RetrieveMoneySwaggingDto.Response> retrieveByToken(HttpServletRequest request, @RequestParam(name = "token") String token) {
-        Optional<MoneySwagging> optionalMoneySwagging = moneySwaggingService.retrieveByToken(token);
+    public ResponseEntity<RetrieveMoneySwaggingDto.Response> retrieveByToken(HttpServletRequest request,
+                                                                             @RequestParam(name = "token") String token) {
+
+        Optional<MoneySwagging> optionalMoneySwagging
+                = moneySwaggingService.retrieveByGiverAndToken(getHeader(Header.USER_ID, request), token);
         if (optionalMoneySwagging.isEmpty()) {
             return ResponseEntity
                     .badRequest()
@@ -61,7 +60,7 @@ public class MoneySwaggingController {
         }
 
         MoneySwagging moneySwagging = optionalMoneySwagging.get();
-        if (isAuthorizedToRetrieve(moneySwagging, request)) {
+        if (moneySwagging.isExpiredToRetrieve()) {
             return ResponseEntity
                     .badRequest()
                     .build();
@@ -75,10 +74,7 @@ public class MoneySwaggingController {
     @PostMapping(URL_ACCEPT_MONEY)
     public ResponseEntity<MoneyAcceptanceDto.Response> acceptMoney(HttpServletRequest httpServletRequest,
                                                                    @RequestBody MoneyAcceptanceDto.Request request) {
-        String strUserId = getHeader(Header.USER_ID, httpServletRequest);
-        String token = request.getToken();
-        Optional<MoneySwagging> optionalMoneySwagging = moneySwaggingService.retrieveByToken(token);
-
+        Optional<MoneySwagging> optionalMoneySwagging = moneySwaggingService.retrieveByChatRoomAndToken(request.getChatRoomId(), request.getToken());
         if (optionalMoneySwagging.isEmpty()) {
             return ResponseEntity
                     .badRequest()
@@ -86,69 +82,37 @@ public class MoneySwaggingController {
         }
 
         MoneySwagging moneySwagging = optionalMoneySwagging.get();
-        Long moneySwaggerId = moneySwagging.getMember().getId();
-        Long userId = Long.valueOf(strUserId);
-
-        if (moneySwaggerId == userId) {
+        if (isNotAuthorizedToAccept(getHeader(Header.USER_ID, httpServletRequest), moneySwagging)) {
             return ResponseEntity
                     .badRequest()
                     .build();
         }
 
-        Boolean isMember = moneySwaggingService.isChatRoomMember(userId, moneySwagging);
-        if (!isMember) {
+        Long memberId = Long.valueOf(getHeader(Header.USER_ID, httpServletRequest));
+        List<MoneyPortion> moneyPortions = moneySwagging.getAvailableMoneyPortions(memberId);
+        if (isNotAvailableToAccept(moneySwagging, moneyPortions)) {
             return ResponseEntity
                     .badRequest()
                     .build();
         }
 
-        if (isOverTenMinutes(moneySwagging)) {
-            return ResponseEntity
-                    .badRequest()
-                    .build();
-        }
-
-        List<MoneyPortion> moneyPortions = moneySwaggingService.getAvailableMoneyPortions(moneySwagging, userId);
-        if (moneyPortions.isEmpty()) {
-            return ResponseEntity
-                    .badRequest()
-                    .build();
-        }
-
-        MoneyPortion moneyPortion = moneySwaggingService.acceptMoney(moneySwagging, moneyPortions, userId);
+        MoneyPortion moneyPortion = moneySwaggingService.acceptMoney(moneySwagging, moneyPortions, memberId);
         MoneyAcceptanceDto.Response responseBody = new MoneyAcceptanceDto.Response(moneyPortion.getAmount());
         return ResponseEntity
                 .ok(responseBody);
     }
 
-    private Boolean isAuthorizedToRetrieve(MoneySwagging moneySwagging, HttpServletRequest request) {
-        return isGiver(moneySwagging, request) || isOverSevenDaysAgo(moneySwagging);
+    private Boolean isNotAvailableToAccept(MoneySwagging moneySwagging, List<MoneyPortion> moneyPortions) {
+        return moneyPortions.isEmpty() || moneySwagging.isExpiredToAcceptMoney();
     }
 
-    private Boolean isGiver(MoneySwagging moneySwagging, HttpServletRequest request) {
+    private Boolean isNotAuthorizedToAccept(String userId, MoneySwagging moneySwagging) {
         try {
-            String userId = getHeader(Header.USER_ID, request);
-            Member moneySwagger = moneySwagging.getMember();
-            return Long.valueOf(userId) != moneySwagger.getId();
+            Long memberId = Long.valueOf(userId);
+            return moneySwagging.isGiver(memberId) || !moneySwagging.isChatRoomMember(memberId);
         } catch (NumberFormatException e) {
             return false;
         }
-    }
-
-    private Boolean isOverTenMinutes(MoneySwagging moneySwagging) {
-        LocalDateTime nowInKst = LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toLocalDateTime();
-        LocalDateTime createdTimeInKst = moneySwagging.getCreatedDate().atZone(ZoneId.of("Asia/Seoul")).toLocalDateTime();
-        LocalDateTime sevenDaysAgo = nowInKst.minusMinutes(10);
-
-        return createdTimeInKst.isBefore(sevenDaysAgo);
-    }
-
-    private Boolean isOverSevenDaysAgo(MoneySwagging moneySwagging) {
-        LocalDateTime nowInKst = LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toLocalDateTime();
-        LocalDateTime createdTimeInKst = moneySwagging.getCreatedDate().atZone(ZoneId.of("Asia/Seoul")).toLocalDateTime();
-        LocalDateTime sevenDaysAgo = nowInKst.minusDays(7);
-
-        return createdTimeInKst.isBefore(sevenDaysAgo);
     }
 
     private String getHeader(Header header, HttpServletRequest request) {

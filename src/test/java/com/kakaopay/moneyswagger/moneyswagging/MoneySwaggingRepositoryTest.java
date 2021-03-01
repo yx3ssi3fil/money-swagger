@@ -1,10 +1,10 @@
 package com.kakaopay.moneyswagger.moneyswagging;
 
-import com.kakaopay.moneyswagger.chatroom.model.ChatRoomRepository;
-import com.kakaopay.moneyswagger.moneyswagging.model.MoneySwagging;
 import com.kakaopay.moneyswagger.chatroom.model.ChatRoom;
+import com.kakaopay.moneyswagger.chatroom.model.ChatRoomRepository;
 import com.kakaopay.moneyswagger.member.model.Member;
 import com.kakaopay.moneyswagger.member.model.MemberRepository;
+import com.kakaopay.moneyswagger.moneyswagging.model.MoneySwagging;
 import com.kakaopay.moneyswagger.moneyswagging.model.MoneySwaggingRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
@@ -48,21 +48,37 @@ class MoneySwaggingRepositoryTest {
     }
 
     @Test
-    void findByToken() {
+    void findByMemberAndToken() {
         //given
         String token = RandomStringUtils.randomAlphabetic(3);
         Member giver = makeTestGiver();
         List<Member> members = makeTestMembers(giver);
         ChatRoom chatRoom = makeTestChatRoom(members);
-        MoneySwagging moneySwagging = makeTestMoneySwagging(token, chatRoom, giver);
-        MoneySwagging savedMoneySwagging = moneySwaggingRepository.save(moneySwagging);
+        MoneySwagging savedMoneySwagging = moneySwaggingRepository.save(makeTestMoneySwagging(token, chatRoom, giver));
 
         //when
-        Optional<MoneySwagging> moneySwaggingByToken = moneySwaggingRepository.findByToken(token);
+        Optional<MoneySwagging> moneySwagging = moneySwaggingRepository.findByMemberAndToken(giver, token);
 
         //then
-        assertThat(moneySwaggingByToken).isPresent();
-        assertThat(moneySwaggingByToken.get().getId()).isEqualTo(savedMoneySwagging.getId());
+        assertThat(moneySwagging).isPresent();
+        assertThat(moneySwagging.get().getId()).isEqualTo(savedMoneySwagging.getId());
+    }
+
+    @Test
+    void findByChatRoomAndToken() {
+        //given
+        String token = RandomStringUtils.randomAlphabetic(3);
+        Member giver = makeTestGiver();
+        List<Member> members = makeTestMembers(giver);
+        ChatRoom chatRoom = makeTestChatRoom(members);
+        MoneySwagging savedMoneySwagging = moneySwaggingRepository.save(makeTestMoneySwagging(token, chatRoom, giver));
+
+        //when
+        Optional<MoneySwagging> moneySwagging = moneySwaggingRepository.findByChatRoomAndToken(chatRoom, token);
+
+        //then
+        assertThat(moneySwagging).isPresent();
+        assertThat(moneySwagging.get().getId()).isEqualTo(savedMoneySwagging.getId());
     }
 
     private MoneySwagging makeTestMoneySwagging(String token, ChatRoom chatRoom, Member giver) {

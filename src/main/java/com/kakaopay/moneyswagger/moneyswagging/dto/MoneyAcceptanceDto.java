@@ -9,9 +9,12 @@ public class MoneyAcceptanceDto {
     @NoArgsConstructor
     public static class Request {
         private String token;
+        private String chatRoomId;
 
-        public Request(String token) {
+        @Builder
+        public Request(String token, String chatRoomId) {
             this.token = token;
+            this.chatRoomId = chatRoomId;
         }
     }
 
