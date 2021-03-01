@@ -15,27 +15,26 @@ endif::[]
 
 === [과제1] 머니 뿌리기 API
 
-operation::money-swagging/create[snippets='http-request']
-operation::money-swagging/create[snippets='request-headers']
-operation::money-swagging/create[snippets='request-fields']
+include::{snippets}/money-swagging/create/http-request.adoc[]
+include::{snippets}/money-swagging/create/request-headers.adoc[]
+include::{snippets}/money-swagging/create/request-fields.adoc[]
 
-operation::money-swagging/create[snippets='http-response']
-operation::money-swagging/create[snippets='response-fields']
-
+include::{snippets}/money-swagging/create/http-response.adoc[]
+include::{snippets}/money-swagging/create/response-fields.adoc[]
 
 === [과제2] 머니 받기 API
 
-operation::money-swagging/accept-money[snippets='http-request']
-operation::money-swagging/accept-money[snippets='request-headers']
-operation::money-swagging/accept-money[snippets='request-fields']
+include::{snippets}/money-swagging/accept-money/http-request.adoc[]
+include::{snippets}/money-swagging/accept-money/request-headers.adoc[]
+include::{snippets}/money-swagging/accept-money/request-fields.adoc[]
 
-operation::money-swagging/accept-money[snippets='http-response']
-operation::money-swagging/accept-money[snippets='response-fields']
+include::{snippets}/money-swagging/accept-money/http-response.adoc[]
+include::{snippets}/money-swagging/accept-money/response-fields.adoc[]
 
 === [과제3] 뿌리기 조회 API
 
-operation::money-swagging/retrieve[snippets='http-request']
-operation::money-swagging/retrieve[snippets='request-headers']
+include::{snippets}/money-swagging/retrieve/http-request.adoc[]
+include::{snippets}/money-swagging/retrieve/request-headers.adoc[]
 
-operation::money-swagging/retrieve[snippets='http-response']
-operation::money-swagging/retrieve[snippets='response-fields']
+include::{snippets}/money-swagging/retrieve/http-response.adoc[]
+include::{snippets}/money-swagging/retrieve/response-fields.adoc[]
